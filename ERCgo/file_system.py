@@ -8,7 +8,7 @@ def findEdgeFile(directory):
 
   elif len(search_result) == 1:
     print('ERCnet edge file found.')
-    return search_result
+    return search_result[0]
 
   else:
     print('Too many edge files found.')
@@ -20,7 +20,7 @@ def findVerticesFile(directory):
 
   elif len(search_result) == 1:
     print('ERCnet vertices file found.')
-    return search_result
+    return search_result[0]
 
   else:
     print('Too many vertices files found.')
