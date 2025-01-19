@@ -11,4 +11,13 @@ argsDict = vars(args)
 edgeFilePath = file_system.findEdgeFile(argsDict['input'])
 verticesFilePath = file_system.findVerticesFile(argsDict['input'])
 
-hog_comp_dict = prep.generate_lookup_dict(verticesFilePath)
+hogCompDict = prep.generate_lookup_dict(verticesFilePath)
+
+with open(edgeFilePath, 'r') as edgeFile:
+  #Skip first line with column titles
+  next(edgeFile)
+  for line in edgeFile:
+    hogPair = line.strip().split('\t')
+    compIDA = prep.lookup(hogPair[0], hogCompDict)
+    compIDB = prep.lookup(hogPair[1], hogCompDict)
+    print(compIDA + ' --> ' + compIDB)
