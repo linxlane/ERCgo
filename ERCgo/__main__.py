@@ -17,7 +17,12 @@ with open(edgeFilePath, 'r') as edgeFile:
   #Skip first line with column titles
   next(edgeFile)
   for line in edgeFile:
+    convertList = []
     hogPair = line.strip().split('\t')
+    convertList.append(hogPair[0])
+    convertList.append(hogPair[1])
     compIDA = prep.lookup(hogPair[0], hogCompDict)
     compIDB = prep.lookup(hogPair[1], hogCompDict)
-    print(compIDA + ' --> ' + compIDB)
+    convertList.append(compIDA)
+    convertList.append(compIDB)
+    print(convertList)
