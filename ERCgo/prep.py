@@ -7,6 +7,10 @@ def generate_lookup_dict(path):
 
 def lookup(hogGene, hogCompDict):
   compGene = hogCompDict.get(hogGene)
+  compGene = formatCompID(compGene)
+  return compGene
+
+def formatCompID(compGene):
   if compGene.startswith('HOG'):
     compGene = 'N/A'
   
