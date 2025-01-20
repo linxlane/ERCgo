@@ -12,7 +12,7 @@ def lookup(hogGene, hogCompDict):
 
 def formatCompID(compGene):
   if compGene.startswith('HOG'):
-    compGene = 'N/A'
+    compGene = None
   
   else:
     compGene = compGene[6:]

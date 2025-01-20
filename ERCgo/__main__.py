@@ -30,6 +30,11 @@ with open(edgeFilePath, 'r') as edgeFile:
     convertList.append(compIDB)
     geneLookupList.append(convertList)
 
-geneLookupDF = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
-geneLookupDF.to_csv('HOG_COMP_TABLE.tsv', sep='\t', index=False)
+geneLookupDF_FULL = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
+geneLookupDF_FULL.to_csv('HOG_COMP_TABLE.tsv', sep='\t', index=False)
+
+geneLookupDF_DROP = geneLookupDF_FULL.dropna()
+print(geneLookupDF_FULL.head())
+print(geneLookupDF_DROP.head())
+print(len(geneLookupDF_FULL) - len(geneLookupDF_DROP))
 
