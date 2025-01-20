@@ -1,6 +1,5 @@
 import cli
-import file_system
-import prep
+import hog_comp_ids
 import pandas
 
 #Parse user input from the command line
@@ -9,32 +8,11 @@ args = cli.runParser()
 argsDict = vars(args)
 
 #print(argsDict)
-edgeFilePath = file_system.findEdgeFile(argsDict['input'])
-verticesFilePath = file_system.findVerticesFile(argsDict['input'])
+edgeFilePath = hog_comp_ids.findEdgeFile(argsDict['input'])
+verticesFilePath = hog_comp_ids.findVerticesFile(argsDict['input'])
 
-hogCompDict = prep.generate_lookup_dict(verticesFilePath)
+hogCompDict = hog_comp_ids.generate_lookup_dict(verticesFilePath)
 
-geneLookupList = []
+geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict)
 
-with open(edgeFilePath, 'r') as edgeFile:
-  #Skip first line with column titles
-  next(edgeFile)
-  for line in edgeFile:
-    convertList = []
-    hogPair = line.strip().split('\t')
-    convertList.append(hogPair[0])
-    convertList.append(hogPair[1])
-    compIDA = prep.lookup(hogPair[0], hogCompDict)
-    compIDB = prep.lookup(hogPair[1], hogCompDict)
-    convertList.append(compIDA)
-    convertList.append(compIDB)
-    geneLookupList.append(convertList)
-
-geneLookupDF_FULL = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
-geneLookupDF_FULL.to_csv('HOG_COMP_TABLE.tsv', sep='\t', index=False)
-
-geneLookupDF_DROP = geneLookupDF_FULL.dropna()
-print(geneLookupDF_FULL.head())
-print(geneLookupDF_DROP.head())
-print(len(geneLookupDF_FULL) - len(geneLookupDF_DROP))
-
+geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL)
