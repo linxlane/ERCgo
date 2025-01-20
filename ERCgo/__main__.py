@@ -1,5 +1,6 @@
 import cli
 import hog_comp_ids
+import goatools_GAF
 
 #Parse user input from the command line
 args = cli.runParser()
@@ -15,3 +16,4 @@ geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict)
 
 geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL)
 
+goatools_GAF.readGAF(argsDict['gaf'])
