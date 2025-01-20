@@ -1,6 +1,7 @@
 import cli
 import file_system
 import prep
+import pandas
 
 #Parse user input from the command line
 args = cli.runParser()
@@ -12,6 +13,8 @@ edgeFilePath = file_system.findEdgeFile(argsDict['input'])
 verticesFilePath = file_system.findVerticesFile(argsDict['input'])
 
 hogCompDict = prep.generate_lookup_dict(verticesFilePath)
+
+geneLookupList = []
 
 with open(edgeFilePath, 'r') as edgeFile:
   #Skip first line with column titles
@@ -25,4 +28,8 @@ with open(edgeFilePath, 'r') as edgeFile:
     compIDB = prep.lookup(hogPair[1], hogCompDict)
     convertList.append(compIDA)
     convertList.append(compIDB)
-    print(convertList)
+    geneLookupList.append(convertList)
+
+geneLookupDF = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
+geneLookupDF.to_csv('HOG_COMP_TABLE.tsv', sep='\t', index=False)
+
