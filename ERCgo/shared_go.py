@@ -30,6 +30,7 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       geneGOList.append(matchingGoList)
 
   geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'GO_Terms_A', 'GO_Terms_B'])
+  print('Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: COMP_GO_TABLE.tsv')
   geneGoDF.to_csv(outputPath + '/COMP_GO_TABLE.tsv', sep='\t', index=False)
   return geneGoDF
   
@@ -52,5 +53,5 @@ def compareGoTerms(geneGoPath, geneGoDF, outputPath):
 
   geneGoDF['Shared_GO'] = goTermIntersectionList
   geneGoDF['Number_of_Shared_GO'] = sharedGoLen
-
+  print('Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO] table to tsv: SHARED_GO_TABLE')
   geneGoDF.to_csv(outputPath + '/SHARED_GO_TABLE.tsv', sep='\t', index=False, na_rep='N/A')
