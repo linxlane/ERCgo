@@ -1,7 +1,7 @@
 from goatools.anno.gaf_reader import GafReader
 import pandas
 
-def readGAF(gafPath):
+def generateGeneGoAssocDF(gafPath):
   ogaf = GafReader(gafPath)
 
   ns2assc = ogaf.get_ns2assc()
@@ -15,7 +15,5 @@ def readGAF(gafPath):
       geneGoPair.append(sorted(go_ids))
       geneAndGoList.append(geneGoPair)
 
-  geneAndGoListdf = pandas.DataFrame(geneAndGoList, columns=['Gene ID', 'GO Terms'])
-  geneAndGoListdf.to_csv('ID_GO_TERMS_TABLE.tsv', sep='\t', index=False)
-
-          
+  geneAndGoListDf = pandas.DataFrame(geneAndGoList, columns=['Gene ID', 'GO Terms'])
+  return geneAndGoListDf

@@ -12,8 +12,10 @@ verticesFilePath = hog_comp_ids.findVerticesFile(argsDict['input'])
 
 hogCompDict = hog_comp_ids.generateLookupDict(verticesFilePath)
 
-geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict)
+geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict, argsDict['output'])
 
-geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL)
+geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL, argsDict['output'])
 
-goatools_GAF.readGAF(argsDict['gaf'])
+goAssocDF = goatools_GAF.generateGeneGoAssocDF(argsDict['gaf'])
+
+goAssocDF.to_csv(argsDict['output'] + '/ID_GO_TERMS_TABLE.tsv', sep='\t', index=False)

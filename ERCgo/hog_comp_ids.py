@@ -46,7 +46,7 @@ def formatCompID(compGene):
 
   return compGene
 
-def generateHogCompTable(edgeFilePath, hogCompDict):
+def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
   geneLookupList = []
 
   with open(edgeFilePath, 'r') as edgeFile:
@@ -64,10 +64,11 @@ def generateHogCompTable(edgeFilePath, hogCompDict):
       geneLookupList.append(convertList)
 
   geneLookupDF_FULL = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
-  geneLookupDF_FULL.to_csv('HOG_COMP_TABLE.tsv', sep='\t', index=False)
+  geneLookupDF_FULL.to_csv(outputPath + '/HOG_COMP_TABLE_FULL.tsv', sep='\t', index=False, na_rep='N/A')
   return geneLookupDF_FULL
 
-def dropNaRows(geneLookupDF_FULL):
+def dropNaRows(geneLookupDF_FULL, outputPath):
   geneLookupDF_DROP = geneLookupDF_FULL.dropna()
   print(str(len(geneLookupDF_FULL) - len(geneLookupDF_DROP)) + ' gene pairs dropped due to no matching comprehensive id for one or both HOG id(s).')
+  geneLookupDF_DROP.to_csv(outputPath + '/HOG_COMP_TABLE_DROP_NA.tsv', sep='\t', index=False)
   return geneLookupDF_DROP
