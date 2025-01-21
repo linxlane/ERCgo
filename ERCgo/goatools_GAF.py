@@ -15,5 +15,5 @@ def generateGeneGoAssocDF(gafPath):
       geneGoPair.append(sorted(go_ids))
       geneAndGoList.append(geneGoPair)
 
-  geneAndGoListDf = pandas.DataFrame(geneAndGoList, columns=['Gene ID', 'GO Terms'])
+  geneAndGoListDf = pandas.DataFrame(geneAndGoList, columns=['Gene_ID', 'GO_Terms'])
   return geneAndGoListDf

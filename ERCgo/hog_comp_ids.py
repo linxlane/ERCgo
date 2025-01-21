@@ -71,4 +71,5 @@ def dropNaRows(geneLookupDF_FULL, outputPath):
   geneLookupDF_DROP = geneLookupDF_FULL.dropna()
   print(str(len(geneLookupDF_FULL) - len(geneLookupDF_DROP)) + ' gene pairs dropped due to no matching comprehensive id for one or both HOG id(s).')
   geneLookupDF_DROP.to_csv(outputPath + '/HOG_COMP_TABLE_DROP_NA.tsv', sep='\t', index=False)
+  geneLookupDF_DROP.to_csv(outputPath + '/COMP_PAIRS_DROP_NA.tsv', sep='\t', index=False, columns=['COMP_GENE_A', 'COMP_GENE_B'])
   return geneLookupDF_DROP
