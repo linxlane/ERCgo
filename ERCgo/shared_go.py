@@ -19,6 +19,12 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       goTermsA = goTermsDict.get(genePair[0])
       goTermsB = goTermsDict.get(genePair[1])
 
+      if goTermsA == None:
+        goTermsA = []
+
+      if goTermsB == None:
+        goTermsB = []
+
       matchingGoList.append(goTermsA)
       matchingGoList.append(goTermsB)
       geneGOList.append(matchingGoList)
@@ -27,3 +33,24 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
   geneGoDF.to_csv(outputPath + '/COMP_GO_TABLE.tsv', sep='\t', index=False)
   return geneGoDF
   
+def compareGoTerms(geneGoPath, geneGoDF, outputPath):
+  goTermIntersectionList = []
+  sharedGoLen = []
+  with open(geneGoPath, 'r') as genePairs:
+    #Skip first line with column titles
+    next(genePairs)
+    for line in genePairs:
+      lineData = line.strip().split('\t')
+      #print(lineData)
+
+      goListA = eval(lineData[2])
+      goListB = eval(lineData[3])
+
+      goTermIntersection = set(goListA) & set(goListB)
+      goTermIntersectionList.append(goTermIntersection)
+      sharedGoLen.append(len(goTermIntersection))
+
+  geneGoDF['Shared_GO'] = goTermIntersectionList
+  geneGoDF['Number_of_Shared_GO'] = sharedGoLen
+
+  geneGoDF.to_csv(outputPath + '/SHARED_GO_TABLE.tsv', sep='\t', index=False, na_rep='N/A')

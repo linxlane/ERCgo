@@ -23,4 +23,6 @@ goAssocDF.to_csv(argsDict['output'] + '/ID_GO_TERMS_TABLE.tsv', sep='\t', index=
 
 assoc_dict = shared_go.generateAssocDict(goAssocDF)
 
-shared_go.genePairGO(argsDict['output'] + '/COMP_PAIRS_DROP_NA.tsv', assoc_dict, argsDict['output'])
+genePairWithGoDF = shared_go.genePairGO(argsDict['output'] + '/COMP_PAIRS_DROP_NA.tsv', assoc_dict, argsDict['output'])
+
+shared_go.compareGoTerms(argsDict['output'] + '/COMP_GO_TABLE.tsv', genePairWithGoDF, argsDict['output'])
