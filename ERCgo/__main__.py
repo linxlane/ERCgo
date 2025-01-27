@@ -2,6 +2,7 @@ import cli
 import hog_comp_ids
 import goatools_GAF
 import shared_go
+import randomize
 
 print('Starting ERCnet Gene Ontology Analysis!')
 print('====================================')
@@ -14,6 +15,12 @@ argsDict = vars(args)
 print('Searching for ERCnet output files...')
 edgeFilePath = hog_comp_ids.findEdgeFile(argsDict['input'])
 verticesFilePath = hog_comp_ids.findVerticesFile(argsDict['input'])
+print('------------------------------------')
+
+###Generate and analyze randomized verions of edge file for stats analysis
+randDirPath = randomize.randomDirectory(argsDict['output'])
+randomize.generateRandomizedFiles(edgeFilePath, randDirPath, 3)
+
 print('------------------------------------')
 
 print('Generate dictionary of {HOG_ID:Comprehensive_ID} to convert edge file HOG IDs to comprehensive IDs')
