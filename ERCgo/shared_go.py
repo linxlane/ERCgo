@@ -34,7 +34,7 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
   geneGoDF.to_csv(outputPath + '/COMP_GO_TABLE.tsv', sep='\t', index=False)
   return geneGoDF
   
-def compareGoTerms(geneGoPath, geneGoDF, outputPath):
+def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName):
   goTermIntersectionList = []
   sharedGoLen = []
   maxPossibleShared = []
@@ -67,4 +67,4 @@ def compareGoTerms(geneGoPath, geneGoDF, outputPath):
   geneGoDF['Max_Shared_GO'] = maxPossibleShared
   geneGoDF['Observed/Max_Shared_GO'] = propSharedList
   print('Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO, Max_Shared_GO, Observed/Max_Shared_GO] table to tsv: SHARED_GO_TABLE')
-  geneGoDF.to_csv(outputPath + '/SHARED_GO_TABLE.tsv', sep='\t', index=False, na_rep='N/A')
+  geneGoDF.to_csv(outputPath + '/SHARED_GO_TABLE_' + edgeFileName + '.tsv', sep='\t', index=False, na_rep='N/A')
