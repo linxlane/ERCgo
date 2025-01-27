@@ -57,7 +57,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
 
 
 print('Starting ERCnet Gene Ontology Analysis!')
-print('====================================')
+print('========================================================================')
 
 #Parse user input from the command line
 args = cli.runParser()
@@ -77,18 +77,27 @@ if not os.path.exists(argsDict['output']):
 else:
     print('Existing output directory found.')
 
+print('========================================================================')
+
+print('Generating randomized versions of ERCnet edge file for statistical analysis')
 masterOut = argsDict['output']
 
 ###Generate and analyze randomized verions of edge file for stats analysis
 randDirPath = randomize.randomDirectory(masterOut)
 randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
 
-print('------------------------------------')
+print('========================================================================')
 
 randEdgeFilesList = collectFiles(randDirPath)
 
 for edgeFile in randEdgeFilesList:
-    edgeFileSharedGO(randDirPath + '/' + edgeFile, ercNetVerticesFilePath, masterOut, getName(edgeFile))
+  print('Now processing: ' + getName(edgeFile))
+  edgeFileSharedGO(randDirPath + '/' + edgeFile, ercNetVerticesFilePath, masterOut, getName(edgeFile))
+  print('========================================================================')
 
 edgeFileName = 'ERCnet_Network'
+print('Now processing: ' + edgeFileName)
 edgeFileSharedGO(ercNetEdgeFilePath, ercNetVerticesFilePath, masterOut, edgeFileName)
+print('========================================================================')
+
+print('Go analysis complete!')
