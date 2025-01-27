@@ -5,6 +5,17 @@ import shared_go
 import randomize
 import os
 
+def collectFiles(path, endStr = '.tsv'):
+    files = []
+    for file in os.listdir(path):
+        if file.endswith(endStr):
+            files.append(file)
+    files.sort()
+    return files
+
+def getName(file):
+    return file[14:20]
+
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
   intermediateFilesPath = masterOutPath + '/Intermediate_Files_' + edgeFileName
@@ -66,6 +77,11 @@ randDirPath = randomize.randomDirectory(masterOut)
 randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
 
 print('------------------------------------')
+
+randEdgeFilesList = collectFiles(randDirPath)
+
+for edgeFile in randEdgeFilesList:
+    edgeFileSharedGO(randDirPath + '/' + edgeFile, ercNetVerticesFilePath, masterOut, getName(edgeFile))
 
 edgeFileName = 'ERCnet_Network'
 edgeFileSharedGO(ercNetEdgeFilePath, ercNetVerticesFilePath, masterOut, edgeFileName)
