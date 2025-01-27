@@ -65,15 +65,15 @@ def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
 
   geneLookupDF_FULL = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
   
-  print('Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table to tsv: HOG_COMP_TABLE_FULL.tsv')
+  print('> Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table to tsv: HOG_COMP_TABLE_FULL.tsv')
   geneLookupDF_FULL.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
   return geneLookupDF_FULL
 
 def dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath):
   geneLookupDF_DROP = geneLookupDF_FULL.dropna()
   print(str(len(geneLookupDF_FULL) - len(geneLookupDF_DROP)) + ' gene pairs dropped due to no matching comprehensive id for one or both HOG id(s).')
-  print('Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table without NONE values to tsv: HOG_COMP_TABLE_DROP_NA.tsv')
+  print('> Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table without NONE values to tsv: HOG_COMP_TABLE_DROP_NA.tsv')
   geneLookupDF_DROP.to_csv(hogCompNaPath, sep='\t', index=False)
-  print('Write [COMP_GENE_A, COMP_GENE_B] table without NONE values to tsv: COMP_PAIRS_DROP_NA.tsv')
+  print('> Write [COMP_GENE_A, COMP_GENE_B] table without NONE values to tsv: COMP_PAIRS_DROP_NA.tsv')
   geneLookupDF_DROP.to_csv(compPairsNaPath, sep='\t', index=False, columns=['COMP_GENE_A', 'COMP_GENE_B'])
   return geneLookupDF_DROP

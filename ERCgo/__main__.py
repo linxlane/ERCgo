@@ -21,37 +21,37 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   intermediateFilesPath = masterOutPath + '/Intermediate_Files_' + edgeFileName
   os.makedirs(intermediateFilesPath)
 
-  print('Generate dictionary of {HOG_ID:Comprehensive_ID} to convert edge file HOG IDs to comprehensive IDs')
+  print('> Generate dictionary of {HOG_ID:Comprehensive_ID} to convert edge file HOG IDs to comprehensive IDs')
   hogCompDict = hog_comp_ids.generateLookupDict(verticesFilePath)
 
-  print('Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]')
+  print('> Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]')
   hogCompPath = intermediateFilesPath + '/HOG_COMP_TABLE_FULL_' + edgeFileName + '.tsv'
   geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict, hogCompPath)
 
-  print('Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
+  print('> Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
   hogCompNaPath = intermediateFilesPath + '/HOG_COMP_TABLE_DROP_NA_' + edgeFileName + '.tsv'
   compPairsNaPath = intermediateFilesPath + '/COMP_PAIRS_DROP_NA_' + edgeFileName + '.tsv'
   geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath)
   print('------------------------------------')
 
-  print('Utilize GOATOOLS package to extract GO terms for COMP_IDs')
+  print('> Utilize GOATOOLS package to extract GO terms for COMP_IDs')
   goAssocDF = goatools_GAF.generateGeneGoAssocDF(argsDict['gaf'])
 
-  print('Write [COMP_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv')
+  print('> Write [COMP_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv')
   compGoPath = intermediateFilesPath + '/ID_GO_TERMS_TABLE_' + edgeFileName + '.tsv'
   goAssocDF.to_csv(compGoPath, sep='\t', index=False)
   print('------------------------------------')
 
-  print('Generate dictionary of {Gene_ID:GO_Terms} to find GO terms associated with genes in ERCnet identified gene pairs')
+  print('> Generate dictionary of {Gene_ID:GO_Terms} to find GO terms associated with genes in ERCnet identified gene pairs')
   assoc_dict = shared_go.generateAssocDict(goAssocDF)
   print('------------------------------------')
 
-  print('Collect GO terms associated with ERCnet pairs and generate table')
+  print('> Collect GO terms associated with ERCnet pairs and generate table')
   compPairsWritePath = intermediateFilesPath + '/COMP_GO_TABLE_' + edgeFileName + '.tsv'
   genePairWithGoDF = shared_go.genePairGO(hogCompNaPath, assoc_dict, compPairsWritePath)
   print('------------------------------------')
 
-  print('Compare GO terms in gene pairs and determine intersection, if any')
+  print('> Compare GO terms in gene pairs and determine intersection, if any')
   sharedGoWritePath = masterOutPath + '/SHARED_GO_TABLE_' + edgeFileName + '.tsv'
   shared_go.compareGoTerms(compPairsWritePath, genePairWithGoDF, sharedGoWritePath)
 
