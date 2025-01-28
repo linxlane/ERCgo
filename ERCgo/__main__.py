@@ -4,17 +4,7 @@ import goatools_GAF
 import shared_go
 import randomize
 import os
-
-def collectFiles(path, endStr = '.tsv'):
-    files = []
-    for file in os.listdir(path):
-        if file.endswith(endStr):
-            files.append(file)
-    files.sort()
-    return files
-
-def getName(file):
-    return file[14:20]
+import glob
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
@@ -88,11 +78,11 @@ randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
 
 print('========================================================================')
 
-randEdgeFilesList = collectFiles(randDirPath)
+randEdgeFilesList = glob.glob(randDirPath + '/*.tsv')
 
 for edgeFile in randEdgeFilesList:
-  print('Now processing: ' + getName(edgeFile))
-  edgeFileSharedGO(randDirPath + '/' + edgeFile, ercNetVerticesFilePath, masterOut, getName(edgeFile))
+  print('Now processing: ' + os.path.basename(edgeFile))
+  edgeFileSharedGO(edgeFile, ercNetVerticesFilePath, masterOut, os.path.basename(edgeFile))
   print('========================================================================')
 
 edgeFileName = 'ERCnet_Network'
