@@ -5,7 +5,7 @@ import shared_go
 import randomize
 import os
 import glob
-import plot
+#import plot
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
@@ -39,7 +39,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
   compPairsWritePath = intermediateFilesPath + '/COMP_GO_TABLE_' + edgeFileName + '.tsv'
-  genePairWithGoDF = shared_go.genePairGO(hogCompNaPath, assoc_dict, compPairsWritePath)
+  genePairWithGoDF = shared_go.genePairGO(compPairsNaPath, assoc_dict, compPairsWritePath)
   print('------------------------------------')
 
   print('> Compare GO terms in gene pairs and determine intersection, if any')
@@ -73,7 +73,6 @@ print('========================================================================'
 print('Generating randomized versions of ERCnet edge file for statistical analysis')
 masterOut = argsDict['output']
 
-'''
 ###Generate and analyze randomized verions of edge file for stats analysis
 randDirPath = randomize.randomDirectory(masterOut)
 randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
@@ -91,7 +90,6 @@ edgeFileName = 'ERCnet_Network'
 print('Now processing: ' + edgeFileName)
 edgeFileSharedGO(ercNetEdgeFilePath, ercNetVerticesFilePath, masterOut, edgeFileName)
 print('========================================================================')
-'''
 
 ###Plots
 sharedGOFilesList = glob.glob(masterOut + '/SHARED_GO_TABLE_*rand*.tsv')
