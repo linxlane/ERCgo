@@ -5,6 +5,7 @@ import shared_go
 import randomize
 import os
 import glob
+import plot
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
@@ -72,6 +73,7 @@ print('========================================================================'
 print('Generating randomized versions of ERCnet edge file for statistical analysis')
 masterOut = argsDict['output']
 
+'''
 ###Generate and analyze randomized verions of edge file for stats analysis
 randDirPath = randomize.randomDirectory(masterOut)
 randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
@@ -89,5 +91,9 @@ edgeFileName = 'ERCnet_Network'
 print('Now processing: ' + edgeFileName)
 edgeFileSharedGO(ercNetEdgeFilePath, ercNetVerticesFilePath, masterOut, edgeFileName)
 print('========================================================================')
+'''
+
+###Plots
+sharedGOFilesList = glob.glob(masterOut + '/SHARED_GO_TABLE_*rand*.tsv')
 
 print('Go analysis complete!')

@@ -68,3 +68,4 @@ def compareGoTerms(geneGoPath, geneGoDF, outputPath):
   geneGoDF['Observed/Max_Shared_GO'] = propSharedList
   print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO, Max_Shared_GO, Observed/Max_Shared_GO] table to tsv: SHARED_GO_TABLE')
   geneGoDF.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
+  
