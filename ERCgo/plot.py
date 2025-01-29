@@ -20,6 +20,12 @@ def collectAndPrep(sharedGOFilesList, writePath):
   
   return final_df
 
+def dropZeros(df):
+  return df[df.Number_of_Shared_GO != 0]
+
+def dropOnes(df):
+  return df[df.Number_of_Shared_GO != 1]
+
 def seabornKDE(sharedGoData, writePath):
   sns.kdeplot(data=sharedGoData, x='Number_of_Shared_GO', hue='label')
   mpl.rcParams['pdf.fonttype'] = 42

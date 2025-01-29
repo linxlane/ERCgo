@@ -75,7 +75,7 @@ masterOut = argsDict['output']
 
 ###Generate and analyze randomized verions of edge file for stats analysis
 randDirPath = randomize.randomDirectory(masterOut)
-randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, 3)
+randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, argsDict['random'])
 
 print('========================================================================')
 
@@ -96,8 +96,10 @@ sharedGOFilesList = glob.glob(masterOut + '/SHARED_GO_TABLE_*.tsv')
 masterSharedGoWritePath = masterOut + '/MASTER_SHARED_GO_TABLE.tsv'
 
 allSharedGoData = plot.collectAndPrep(sharedGOFilesList, masterSharedGoWritePath)
+removeZeroRows = plot.dropZeros(allSharedGoData)
+removeOneRows = plot.dropOnes(removeZeroRows)
 
 kdeWritePath = masterOut + '/MASTER_SHARED_GO_TABLE_KDE.pdf'
-plot.seabornKDE(allSharedGoData, kdeWritePath)
+plot.seabornKDE(removeOneRows, kdeWritePath)
 
 print('Go analysis complete!')
