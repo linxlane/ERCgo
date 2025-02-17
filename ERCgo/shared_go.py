@@ -1,4 +1,5 @@
 import pandas
+from collections import Counter
 
 def generateAssocDict(df):
   assoc_dict = df.set_index('Gene_ID')['GO_Terms'].to_dict()
@@ -33,6 +34,20 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
   print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: COMP_GO_TABLE.tsv')
   geneGoDF.to_csv(outputPath, sep='\t', index=False)
   return geneGoDF
+
+def generatePopulation(uniqueIds, assoc_dict):
+  goTermsPopulation = []
+  keyErrorCounter = 0
+  for gene in uniqueIds:
+    if gene in assoc_dict.keys():
+      goTermsPopulation.extend(assoc_dict[gene])
+    else:
+      keyErrorCounter += 1
+  #print(goTermsPopulation)
+  print(f'Number of keys not found: {keyErrorCounter}')
+
+  populationCounts = Counter(goTermsPopulation)
+  return populationCounts
 
 def overlapScore():
   return None

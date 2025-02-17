@@ -41,18 +41,8 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   print('------------------------------------')
 
   print('> Generate counter dictionary of GO terms in [COMP_GENE_A, COMP_GENE_B] columns for overlap score calculation')
-  goTermsPopulation = []
-  keyErrorCounter = 0
-  for gene in uniqueIds:
-    if gene in assoc_dict.keys():
-      goTermsPopulation.extend(assoc_dict[gene])
-    else:
-      keyErrorCounter += 1
-  #print(goTermsPopulation)
-  print(f'Number of keys not found: {keyErrorCounter}')
-
-  populationCounts = Counter(goTermsPopulation)
-  print(populationCounts)
+  shared_go.generatePopulation(uniqueIds, assoc_dict)
+  print('------------------------------------')
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
   compPairsWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B]_TABLE_' + edgeFileName + '.tsv'
