@@ -7,6 +7,7 @@ import os
 import glob
 import plot
 import shutil
+from collections import Counter
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
@@ -38,6 +39,8 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   print('> Generate dictionary of {Gene_ID:GO_Terms} to find GO terms associated with genes in ERCnet identified gene pairs')
   assoc_dict = shared_go.generateAssocDict(goAssocDF)
   print('------------------------------------')
+
+  print('> Generate counter dictionary of GO terms in [COMP_GENE_A, COMP_GENE_B] columns for overlap score calculation')
   goTermsPopulation = []
   keyErrorCounter = 0
   for gene in uniqueIds:
@@ -45,8 +48,11 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
       goTermsPopulation.extend(assoc_dict[gene])
     else:
       keyErrorCounter += 1
-  print(goTermsPopulation)
+  #print(goTermsPopulation)
   print(f'Number of keys not found: {keyErrorCounter}')
+
+  populationCounts = Counter(goTermsPopulation)
+  print(populationCounts)
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
   compPairsWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B]_TABLE_' + edgeFileName + '.tsv'
