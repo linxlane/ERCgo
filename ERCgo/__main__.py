@@ -17,12 +17,12 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   hogCompDict = hog_comp_ids.generateLookupDict(verticesFilePath)
 
   print('> Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]')
-  hogCompPath = intermediateFilesPath + '/HOG_COMP_TABLE_FULL_' + edgeFileName + '.tsv'
+  hogCompPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_FULL_' + edgeFileName + '.tsv'
   geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict, hogCompPath)
 
   print('> Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
-  hogCompNaPath = intermediateFilesPath + '/HOG_COMP_TABLE_DROP_NA_' + edgeFileName + '.tsv'
-  compPairsNaPath = intermediateFilesPath + '/COMP_PAIRS_DROP_NA_' + edgeFileName + '.tsv'
+  hogCompNaPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_DROP_NA_' + edgeFileName + '.tsv'
+  compPairsNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B]_DROP_NA_' + edgeFileName + '.tsv'
   geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath)
   print('------------------------------------')
   uniqueIds = hog_comp_ids.generatePopulation(compPairsNaPath)
@@ -31,7 +31,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   goAssocDF = goatools_GAF.generateGeneGoAssocDF(argsDict['gaf'])
 
   print('> Write [COMP_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv')
-  compGoPath = intermediateFilesPath + '/ID_GO_TERMS_TABLE_' + edgeFileName + '.tsv'
+  compGoPath = intermediateFilesPath + '/[COMP_ID, GO_Terms]_TABLE_' + edgeFileName + '.tsv'
   goAssocDF.to_csv(compGoPath, sep='\t', index=False)
   print('------------------------------------')
 
@@ -49,7 +49,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   print(f'Number of keys not found: {keyErrorCounter}')
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
-  compPairsWritePath = intermediateFilesPath + '/COMP_GO_TABLE_' + edgeFileName + '.tsv'
+  compPairsWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B]_TABLE_' + edgeFileName + '.tsv'
   genePairWithGoDF = shared_go.genePairGO(compPairsNaPath, assoc_dict, compPairsWritePath)
   print('------------------------------------')
 
