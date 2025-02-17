@@ -7,7 +7,6 @@ import os
 import glob
 import plot
 import shutil
-from collections import Counter
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
