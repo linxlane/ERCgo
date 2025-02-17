@@ -33,6 +33,9 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
   print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: COMP_GO_TABLE.tsv')
   geneGoDF.to_csv(outputPath, sep='\t', index=False)
   return geneGoDF
+
+def overlapScore():
+  return None
   
 def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName):
   goTermIntersectionList = []

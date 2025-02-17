@@ -6,6 +6,7 @@ import randomize
 import os
 import glob
 import plot
+import shutil
 
 def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName):
 
@@ -24,6 +25,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   compPairsNaPath = intermediateFilesPath + '/COMP_PAIRS_DROP_NA_' + edgeFileName + '.tsv'
   geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath)
   print('------------------------------------')
+  uniqueIds = hog_comp_ids.generatePopulation(compPairsNaPath)
 
   print('> Utilize GOATOOLS package to extract GO terms for COMP_IDs')
   goAssocDF = goatools_GAF.generateGeneGoAssocDF(argsDict['gaf'])
@@ -36,6 +38,15 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   print('> Generate dictionary of {Gene_ID:GO_Terms} to find GO terms associated with genes in ERCnet identified gene pairs')
   assoc_dict = shared_go.generateAssocDict(goAssocDF)
   print('------------------------------------')
+  goTermsPopulation = []
+  keyErrorCounter = 0
+  for gene in uniqueIds:
+    if gene in assoc_dict.keys():
+      goTermsPopulation.extend(assoc_dict[gene])
+    else:
+      keyErrorCounter += 1
+  print(goTermsPopulation)
+  print(f'Number of keys not found: {keyErrorCounter}')
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
   compPairsWritePath = intermediateFilesPath + '/COMP_GO_TABLE_' + edgeFileName + '.tsv'
@@ -61,12 +72,15 @@ ercNetVerticesFilePath = hog_comp_ids.findVerticesFile(argsDict['input'])
 print('------------------------------------')
 
 if not os.path.exists(argsDict['output']):
-    print('A directory does not exist at this path.')
-    print('Making directory for writing all output files...')
-    os.makedirs(argsDict['output'])
-    print('Successful')
+  print('A directory does not exist at this path.')
+  print('Making directory for writing all output files...')
+  os.makedirs(argsDict['output'])
+  print('Successful')
 else:
-    print('Existing output directory found.')
+  print('Existing output directory found.')
+  if os.path.exists(argsDict['output']):
+    shutil.rmtree(os.path.abspath(argsDict['output']))
+    print('Existing dictionary deleted.')
 
 print('========================================================================')
 

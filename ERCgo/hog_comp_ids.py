@@ -77,3 +77,9 @@ def dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath):
   print('> Write [COMP_GENE_A, COMP_GENE_B] table without NONE values to tsv: COMP_PAIRS_DROP_NA.tsv')
   geneLookupDF_DROP.to_csv(compPairsNaPath, sep='\t', index=False, columns=['COMP_GENE_A', 'COMP_GENE_B'])
   return geneLookupDF_DROP
+
+def generatePopulation(compIDPairsPath):
+  genePairsDf = pandas.read_csv(compIDPairsPath, sep='\t')
+  uniqueGenes = set(list(genePairsDf['COMP_GENE_A']) + list(genePairsDf['COMP_GENE_B']))
+  #print(uniqueGenes)
+  return uniqueGenes
