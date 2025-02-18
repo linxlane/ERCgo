@@ -50,6 +50,8 @@ def generatePopulation(uniqueIds, assoc_dict):
   return populationCounts
 
 def overlapScore():
+  weightedIntersection = 0
+  
   return None
   
 def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName):

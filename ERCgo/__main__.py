@@ -40,7 +40,10 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   print('------------------------------------')
 
   print('> Generate counter dictionary of GO terms in [COMP_GENE_A, COMP_GENE_B] columns for overlap score calculation')
-  shared_go.generatePopulation(uniqueIds, assoc_dict)
+  counts = shared_go.generatePopulation(uniqueIds, assoc_dict)
+  with open(masterOutPath + '/Population_Counts.tsv', 'w') as file:
+    for key, value in counts.items():
+      file.write(f'{key}\t{value}\n')
   print('------------------------------------')
 
   print('> Collect GO terms associated with ERCnet pairs and generate table')
