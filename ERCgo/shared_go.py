@@ -63,7 +63,88 @@ def overlapScore(setA, setB, population):
     overlapScore = (2 * weightedIntersection / totalSetLengths) * (1 - (1 / totalSetLengths))
 
   return overlapScore
-  
+
+def sanityCheck(baseDF, writePath, geneGoPath, counts):
+  sanityDF = baseDF.copy(deep=True)
+
+  lengthGoAList = []
+  lengthGoBList = []
+  goTermIntersectionList = []
+  sharedGoLen = []
+  countsA = []
+  countsA_List = []
+  countsB = []
+  countsB_List = []
+  weightedIntersectionList = []
+  weightedIntersection = 0.0
+  totalSetLengthsList = []
+  overlapScore = 0.0
+  overlapScoreList = []
+  formula = ''
+  formulaList = []
+
+  with open(geneGoPath, 'r') as genePairs:
+    #Skip first line with column titles
+    next(genePairs)
+    for line in genePairs:
+      lineData = line.strip().split('\t')
+      #print(lineData)
+
+      goListA = eval(lineData[2])
+      goListB = eval(lineData[3])
+
+      goSetA = set(goListA)
+      goSetB = set(goListB)
+
+      lengthGoAList.append(len(goListA))
+      lengthGoBList.append(len(goListB))
+
+      goTermIntersection = goSetA & goSetB
+      goTermIntersectionList.append(goTermIntersection)
+      sharedGoLen.append(len(goTermIntersection))
+
+      for termA in goListA:
+        #print(term, counts[term])
+        countsA.append(counts[termA])
+      #print(countsA)
+      countsA_List.append(countsA)
+      countsA = []
+
+      for termB in goListB:
+        countsB.append(counts[termB])
+      countsB_List.append(countsB)
+      countsB = []
+
+      totalSetLengths = len(goSetA) + len(goSetB)
+      totalSetLengthsList.append(totalSetLengths)
+
+      if totalSetLengths == 0:
+        overlapScore = 0.0
+        weightedIntersection = 0.0
+      else:
+        for term in goSetA & goSetB:
+          weightedIntersection += 1/counts[term]
+          overlapScore = (2 * weightedIntersection / totalSetLengths) * (1 - (1 / totalSetLengths))
+      weightedIntersectionList.append(weightedIntersection)
+      overlapScoreList.append(overlapScore)
+
+      formula = f'(2 * {weightedIntersection} / {totalSetLengths}) * (1 - (1 / {totalSetLengths}))'
+      formulaList.append(formula)
+
+  sanityDF['Length_Go_A'] = lengthGoAList
+  sanityDF['Length_Go_B'] = lengthGoBList
+  sanityDF['Shared_GO'] = goTermIntersectionList
+  sanityDF['Number_of_Shared_GO'] = sharedGoLen  
+  sanityDF['Population_Counts_A'] = countsA_List
+  sanityDF['Population_Counts_B'] = countsB_List
+  sanityDF['Weighted_Intersection'] = weightedIntersectionList
+  sanityDF['Length_SetA_and_SetB'] = totalSetLengthsList
+  sanityDF['Formula'] = formulaList
+  sanityDF['Overlap_Score'] = overlapScoreList
+
+  sanityDF.to_csv(writePath, sep='\t', index=False, na_rep='N/A')
+
+
 def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName, population):
   goTermIntersectionList = []
   sharedGoLen = []
@@ -102,5 +183,5 @@ def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName, population):
   geneGoDF['Observed/Max_Shared_GO'] = propSharedList
   geneGoDF['Overlap_Score'] = propSharedList
   geneGoDF['label'] = edgeFileName
-  print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO, Max_Shared_GO, Observed/Max_Shared_GO] table to tsv: SHARED_GO_TABLE')
+  print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO, Max_Shared_GO, Observed/Max_Shared_GO, Overlap_Score, label] table to tsv: SHARED_GO_TABLE')
   geneGoDF.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')

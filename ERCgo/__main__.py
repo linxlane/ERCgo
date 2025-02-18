@@ -51,6 +51,11 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
   genePairWithGoDF = shared_go.genePairGO(compPairsNaPath, assoc_dict, compPairsWritePath)
   print('------------------------------------')
 
+  print('> Generate and Write Sanity Check File')
+  sanityCheckWritePath = masterOutPath + '/SANITY_CHECK_' + edgeFileName + '.tsv'
+  shared_go.sanityCheck(genePairWithGoDF, sanityCheckWritePath, compPairsWritePath, counts)
+  print('------------------------------------')
+
   print('> Compare GO terms in gene pairs and determine intersection, if any')
   sharedGoWritePath = masterOutPath + '/SHARED_GO_TABLE_' + edgeFileName + '.tsv'
   shared_go.compareGoTerms(compPairsWritePath, genePairWithGoDF, sharedGoWritePath, edgeFileName, counts)
