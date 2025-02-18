@@ -30,4 +30,4 @@ def seabornKDE(sharedGoData, writePath):
   sns.kdeplot(data=sharedGoData, x='Number_of_Shared_GO', hue='label')
   mpl.rcParams['pdf.fonttype'] = 42
   plt.savefig(writePath, format = 'pdf', transparent = True)
-  plt.show()
+  #plt.show()
