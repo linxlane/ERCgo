@@ -31,7 +31,7 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       geneGOList.append(matchingGoList)
 
   geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'GO_Terms_A', 'GO_Terms_B'])
-  print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: COMP_GO_TABLE.tsv')
+  print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B].tsv')
   geneGoDF.to_csv(outputPath, sep='\t', index=False)
   return geneGoDF
 
@@ -82,6 +82,8 @@ def sanityCheck(baseDF, writePath, geneGoPath, counts):
   overlapScoreList = []
   formula = ''
   formulaList = []
+  termntersectionCount = []
+  intersectionCountsList = []
 
   with open(geneGoPath, 'r') as genePairs:
     #Skip first line with column titles
@@ -122,11 +124,17 @@ def sanityCheck(baseDF, writePath, geneGoPath, counts):
         overlapScore = 0.0
         weightedIntersection = 0.0
       else:
-        for term in goSetA & goSetB:
-          weightedIntersection += 1/counts[term]
+        for term in goSetA.intersection(goSetB):
+          termCount = counts[term]
+          termntersectionCount.append(termCount)
+          weightedIntersection += 1/termCount
           overlapScore = (2 * weightedIntersection / totalSetLengths) * (1 - (1 / totalSetLengths))
       weightedIntersectionList.append(weightedIntersection)
+      weightedIntersection = 0.0
+      intersectionCountsList.append(termntersectionCount)
+      termntersectionCount = []
       overlapScoreList.append(overlapScore)
+      overlapScore = 0.0
 
       formula = f'(2 * {weightedIntersection} / {totalSetLengths}) * (1 - (1 / {totalSetLengths}))'
       formulaList.append(formula)
@@ -137,6 +145,7 @@ def sanityCheck(baseDF, writePath, geneGoPath, counts):
   sanityDF['Number_of_Shared_GO'] = sharedGoLen  
   sanityDF['Population_Counts_A'] = countsA_List
   sanityDF['Population_Counts_B'] = countsB_List
+  sanityDF['Intersection_Counts'] = intersectionCountsList
   sanityDF['Weighted_Intersection'] = weightedIntersectionList
   sanityDF['Length_SetA_and_SetB'] = totalSetLengthsList
   sanityDF['Formula'] = formulaList
