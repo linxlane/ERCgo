@@ -53,7 +53,7 @@ def edgeFileSharedGO(edgeFilePath, verticesFilePath, masterOutPath, edgeFileName
 
   print('> Compare GO terms in gene pairs and determine intersection, if any')
   sharedGoWritePath = masterOutPath + '/SHARED_GO_TABLE_' + edgeFileName + '.tsv'
-  shared_go.compareGoTerms(compPairsWritePath, genePairWithGoDF, sharedGoWritePath, edgeFileName)
+  shared_go.compareGoTerms(compPairsWritePath, genePairWithGoDF, sharedGoWritePath, edgeFileName, counts)
 
 
 print('Starting ERCnet Gene Ontology Analysis!')
@@ -105,13 +105,13 @@ print('========================================================================'
 
 print('Generating KDE')
 sharedGOFilesList = glob.glob(masterOut + '/SHARED_GO_TABLE_*.tsv')
-masterSharedGoWritePath = masterOut + '/MASTER_SHARED_GO_TABLE.tsv'
+randAndErcNetSharedGoWritePath = masterOut + '/RAND_ERCnet_SHARED_GO_TABLE.tsv'
 
-allSharedGoData = plot.collectAndPrep(sharedGOFilesList, masterSharedGoWritePath)
-removeZeroRows = plot.dropZeros(allSharedGoData)
-removeOneRows = plot.dropOnes(removeZeroRows)
+allSharedGoData = plot.collectAndPrep(sharedGOFilesList, randAndErcNetSharedGoWritePath)
+#removeZeroRows = plot.dropZeros(allSharedGoData)
+#removeOneRows = plot.dropOnes(removeZeroRows)
 
-kdeWritePath = masterOut + '/MASTER_SHARED_GO_TABLE_KDE.pdf'
-plot.seabornKDE(removeOneRows, kdeWritePath)
+kdeWritePath = masterOut + '/RAND_ERCnet_SHARED_GO_TABLE_KDE.pdf'
+plot.seabornKDE(allSharedGoData, kdeWritePath)
 
 print('Go analysis complete!')

@@ -49,16 +49,28 @@ def generatePopulation(uniqueIds, assoc_dict):
   populationCounts = Counter(goTermsPopulation)
   return populationCounts
 
-def overlapScore():
+def overlapScore(setA, setB, population):
   weightedIntersection = 0
   
-  return None
+  totalSetLengths = len(setA) + len(setB)
+
+  if totalSetLengths == 0:
+    overlapScore = 0.0
+  else:
+    for term in setA & setB:
+      weightedIntersection += 1/population[term]
+    
+    overlapScore = (2 * weightedIntersection / totalSetLengths) * (1 - (1 / totalSetLengths))
+
+  return overlapScore
   
-def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName):
+def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName, population):
   goTermIntersectionList = []
   sharedGoLen = []
   maxPossibleShared = []
   propSharedList = []
+  overlapScoreList = []
+
   with open(geneGoPath, 'r') as genePairs:
     #Skip first line with column titles
     next(genePairs)
@@ -82,10 +94,13 @@ def compareGoTerms(geneGoPath, geneGoDF, outputPath, edgeFileName):
         propSharedGO = len(goTermIntersection)/shortestList
       propSharedList.append(propSharedGO)
 
+      overlapScoreList.append(overlapScore(set(goListA), set(goListB), population))
+
   geneGoDF['Shared_GO'] = goTermIntersectionList
   geneGoDF['Number_of_Shared_GO'] = sharedGoLen
   geneGoDF['Max_Shared_GO'] = maxPossibleShared
   geneGoDF['Observed/Max_Shared_GO'] = propSharedList
+  geneGoDF['Overlap_Score'] = propSharedList
   geneGoDF['label'] = edgeFileName
   print('> Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Shared_GO, Number_of_Shared_GO, Max_Shared_GO, Observed/Max_Shared_GO] table to tsv: SHARED_GO_TABLE')
   geneGoDF.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')

@@ -27,7 +27,7 @@ def dropOnes(df):
   return df[df.Number_of_Shared_GO != 1]
 
 def seabornKDE(sharedGoData, writePath):
-  sns.kdeplot(data=sharedGoData, x='Number_of_Shared_GO', hue='label')
+  sns.kdeplot(data=sharedGoData, x='Overlap_Score', hue='label')
   mpl.rcParams['pdf.fonttype'] = 42
   plt.savefig(writePath, format = 'pdf', transparent = True)
   #plt.show()
