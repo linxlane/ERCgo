@@ -12,4 +12,7 @@ def runParser():
   parser.add_argument('-r', '--random', required=True, type = int, metavar='int',
     help='''Number of random replicates to generate and analyze.''')
   
+  parser.add_argument('-m', '--rand_method', required=False, default='B', choices=['AB', 'B'],
+    help='''Randomize both A and B columns or just B column in randomized edge files''')
+  
   return parser.parse_args()

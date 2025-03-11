@@ -92,7 +92,7 @@ else:
 
   ##Make copies of edge file with randomized B column, write in randomized directory
   print('Starting generation of random replicate(s)')
-  randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, argsDict['random'])
+  randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, argsDict['random'], argsDict['rand_method'])
 
   print('\n')
 
