@@ -134,7 +134,7 @@ edgeFileName = 'ERCnet_Network'
 print('Now processing: ' + edgeFileName)
 
 #Get GO terms for each gene pair and create table
-geneGoDF, writePath, frequencies = shared_go.generateSharedGOTable(masterOutPath, randEdgeFile, hogCompDict, geneGoDict, edgeFileName)
+geneGoDF, writePath, frequencies = shared_go.generateSharedGOTable(masterOutPath, ercNetEdgeFilePath, hogCompDict, geneGoDict, edgeFileName)
 
 #Analyze GO term sets returned for each gene pair, find intersection, and calculate score
 shared_go.analyzeSharedGo(geneGoDF, masterOutPath, writePath, frequencies, edgeFileName)
