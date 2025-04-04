@@ -37,8 +37,16 @@ def wilcoxonTest(sharedGoList):
   # Mann-Whitney U Test
 
   print("Sample sizes:", len(ercNetDist), len(randDist))
-  print("Number of zeros in ercNetDist:", np.sum(ercNetDist == 0.0))
-  print("Number of zeros in randDist:", np.sum(randDist == 0.0))
+  print("Number of zeros in ercNetDist:", ercNetDist.count(0.0))
+  print("Number of zeros in randDist:", randDist.count(0.0))
+  print('\n')
+
+  mean_ERCnet = np.mean(ercNetDist)
+  mean_rand = np.mean(randDist)
+
+  print(f"Mean of ercNetDist: {mean_ERCnet}")
+  print(f"Mean of randDist: {mean_rand}")
+  print('\n')
 
   # Compute ranks (Mann-Whitney works with ranks)
   combined_data = np.concatenate((ercNetDist, randDist))
@@ -51,6 +59,7 @@ def wilcoxonTest(sharedGoList):
 
   print(f"Mean Rank of ercNetDist: {mean_rank1}")
   print(f"Mean Rank of randDist: {mean_rank2}")
+  print('\n')
 
   if mean_rank1 > mean_rank2:
       print("ercNetDist has larger values on average.")
@@ -61,8 +70,7 @@ def wilcoxonTest(sharedGoList):
   print("First 10 ranks of randDist:", ranks2[:10])
 
   # Mann-Whitney U Test
-  # ‘less’: the distribution underlying x is stochastically less than the distribution underlying y, i.e. SX(u) < SY(u) for all u.
-  u_stat, p_mw = mannwhitneyu(ercNetDist, randDist, alternative='less')
+  u_stat, p_mw = mannwhitneyu(ercNetDist, randDist, alternative='greater')
 
   # Compute expected U under null hypothesis
   n1, n2 = len(ercNetDist), len(randDist)
@@ -79,8 +87,6 @@ def wilcoxonTest(sharedGoList):
 print('################################################')
 print('Starting Statistical Analysis of ERCgo Analysis!')
 print('################################################')
-print('\n')
-
 
 ##Parse CLI arguments
 print('---------------------------------------------------------------------------------------------------')
@@ -107,13 +113,22 @@ sharedGOAnalysisFilesList = glob.glob(argsDict['input'] + '/GO_ANALYSIS_*.tsv')
 
 if len(sharedGOAnalysisFilesList) > 0:
   sharedGOAnalysisFilesList.sort()
-  print('Analysis files found: ' + str(sharedGOAnalysisFilesList))
+  print('Analysis files found!')
+  print('\n')
 
   print('---------------------------------------------------------------------------------------------------')
   print('Perform Wilcoxon Statistical Test')
   print('---------------------------------------------------------------------------------------------------')
+  print('\n')
+  
   wilcoxonTest(sharedGOAnalysisFilesList)
-else:
-  print('No analysis files found. Please try again')
-
+  
+  print('\n')
+  print('###########################################')
   print('Statistical analysis and plotting complete!')
+  print('###########################################')
+  print('\n')
+
+else:
+  print('No analysis files found. Please try again')  
+  print('\n')

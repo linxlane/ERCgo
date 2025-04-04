@@ -15,10 +15,15 @@ def generateSharedGOTable(masterOutPath, edgeFilePath, hogCompDict, geneGoDict, 
   #Create and write tsv that contains equivalent HOG-COMP id values
   geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict, hogCompPath)
 
+  print('  > Append R2 and pvalues from edge file')
+  print('    > Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval]')
+  hogCompNetStatsPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval]_FULL_' + edgeFileName + '.tsv'
+  hogCompNetStatsDF_Full = hog_comp_ids.appendStats(geneLookupDF_FULL, edgeFilePath, hogCompNetStatsPath)
+
   print('  > Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
   hogCompNaPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_DROP_NA_' + edgeFileName + '.tsv'
-  compPairsNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B]_DROP_NA_' + edgeFileName + '.tsv'
-  geneLookupDF_DROP = hog_comp_ids.dropNaRows(geneLookupDF_FULL, hogCompNaPath, compPairsNaPath)
+  compPairsNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA_' + edgeFileName + '.tsv'
+  hogCompNetStatsDF_DROP = hog_comp_ids.dropNaRows(hogCompNetStatsDF_Full, hogCompNaPath, compPairsNaPath)
 
   ##Summarize GO term population for all GO terms associated with genes in the current edge file
   print('2. Gather GO term population of all genes in edge file')
@@ -71,6 +76,12 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       if goTermsB == None:
         goTermsB = []
 
+      #Append R2 values and p values
+      matchingGoList.append(genePair[2])
+      matchingGoList.append(genePair[3])
+      matchingGoList.append(genePair[4])
+      matchingGoList.append(genePair[5])
+
       #Append GO terms for each gene to row representation list
       matchingGoList.append(goTermsA)
       matchingGoList.append(goTermsB)
@@ -79,8 +90,8 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       geneGOList.append(matchingGoList)
 
   ##Write table to file
-  geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'GO_Terms_A', 'GO_Terms_B'])
-  print('  > Write [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B] table to tsv: [COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B].tsv')
+  geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
+  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv')
   geneGoDF.to_csv(outputPath, sep='\t', index=False)
   return geneGoDF
 
@@ -119,8 +130,8 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       lineData = line.strip().split('\t')
 
       #Get GO terms for gene A and gene B
-      goListA = eval(lineData[2])
-      goListB = eval(lineData[3])
+      goListA = eval(lineData[6])
+      goListB = eval(lineData[7])
 
       #Convert GO term data to sets
       goSetA = set(goListA)
@@ -193,6 +204,6 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Overlap_Score'] = overlapScoreList
   sharedStatsDF['label'] = edgeFileName
 
-  print('  > Write analysis table to tsv: GO_ANALYSIS_.tsv')
+  print('  > Write analysis table to tsv')
   analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + edgeFileName + '.tsv'
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
