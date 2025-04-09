@@ -202,7 +202,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Length_SetA_and_SetB'] = totalSetLengthsList
   sharedStatsDF['Formula'] = formulaList
   sharedStatsDF['Overlap_Score'] = overlapScoreList
-  sharedStatsDF['label'] = edgeFileName
+  sharedStatsDF['File'] = edgeFileName
 
   print('  > Write analysis table to tsv')
   analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + edgeFileName + '.tsv'
