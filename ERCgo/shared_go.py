@@ -102,6 +102,12 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
   sharedStatsDF = baseDF.copy(deep=True)
 
+  #Clp genes and other genes of interest for plot coloring
+  interestGenes = ['ATCG00670', 'AT1G49970', 'AT1G12410', 'AT1G09130', 
+                   'AT4G17040', 'AT1G66670', 'AT4G12060', 'AT1G06950', 
+                   'AT5G53080', 'AT2G04270', 'AT1G26460', 'AT3G12380', 
+                   'AT3G60830', 'AT1G10510', 'AT3G19800', 'AT1G36320']
+
   ##Initialize new rows and variables to conduct calculations/analysis
   lengthGoAList = []
   lengthGoBList = []
@@ -120,6 +126,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   formulaList = []
   termIntersectionCount = []
   intersectionFrequenciesList = []
+  color = []
 
   ##Iterate through gene pairs and GO terms and conduct analysis
   with open(geneGoPath, 'r') as genePairs:
@@ -128,6 +135,14 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
     for line in genePairs:
       #Separate 'row' data
       lineData = line.strip().split('\t')
+
+      geneA = lineData[0]
+      geneB = lineData[1]
+
+      if geneA in interestGenes or geneB in interestGenes:
+        color.append('orange')
+      else:
+        color.append('blue')
 
       #Get GO terms for gene A and gene B
       goListA = eval(lineData[6])
@@ -202,6 +217,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Length_SetA_and_SetB'] = totalSetLengthsList
   sharedStatsDF['Formula'] = formulaList
   sharedStatsDF['Overlap_Score'] = overlapScoreList
+  sharedStatsDF['Color'] = color
   sharedStatsDF['File'] = edgeFileName
 
   print('  > Write analysis table to tsv')
