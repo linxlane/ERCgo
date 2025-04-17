@@ -83,6 +83,44 @@ def wilcoxonTest(sharedGoList):
   print(f"Z-score: {(u_stat - expected_u) / std_u}")
   print(f"P-value: {p_mw}")
 
+def scatterPlot(sharedGoTable):
+  ercData = pandas.read_csv(sharedGoTable, sep='\t')
+
+  clpClpMask = ercData['Color'] == 'Clp-Clp interaction'
+  clpInterestMask = ercData['Color'] == 'Clp-interest interaction'
+  interestInterestMask = ercData['Color'] == 'Interest-Interest interaction'
+  noIntAbovePoint005 = ercData['Overlap_Score'] > 0.005
+  noInterestMask = ercData['Color'] == 'Not of interest'
+
+  clpClpDF = ercData[clpClpMask].reset_index()
+  clpIntDF = ercData[clpInterestMask].reset_index()
+  intIntDF = ercData[interestInterestMask].reset_index()
+  noIntAbovePoint005DF = ercData[noIntAbovePoint005].reset_index()
+
+
+  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='Overlap_Score', y='P_R2', marker='X', color='green', zorder=1)
+  interestInterest = sns.scatterplot(data=ercData[interestInterestMask], x='Overlap_Score', y='P_R2', marker='o', color='purple',  zorder=2)
+  clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='Overlap_Score', y='P_R2', marker='o', color='orange',  zorder=2)
+  clpClp = sns.scatterplot(data=ercData[clpClpMask], x='Overlap_Score', y='P_R2', marker='o', color='blue', zorder=2)
+
+  for point in range(len(noIntAbovePoint005DF)):
+    label = noIntAbovePoint005DF['COMP_GENE_A'][point] + '-' + noIntAbovePoint005DF['COMP_GENE_B'][point]
+    plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
+
+  for point in range(len(intIntDF)):
+    label = intIntDF['COMP_GENE_A'][point] + '-' + intIntDF['COMP_GENE_B'][point]
+    plt.text(x=intIntDF['Overlap_Score'][point], y=intIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+
+  for point in range(len(clpIntDF)):
+    label = clpIntDF['COMP_GENE_A'][point] + '-' + clpIntDF['COMP_GENE_B'][point]
+    plt.text(x=clpIntDF['Overlap_Score'][point], y=clpIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
+  
+  for point in range(len(clpClpDF)):
+    label = clpClpDF['COMP_GENE_A'][point] + '-' + clpClpDF['COMP_GENE_B'][point]
+    plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+
+  plt.show()
+
 ##Start of main stat and plotting script
 print('################################################')
 print('Starting Statistical Analysis of ERCgo Analysis!')
@@ -95,15 +133,15 @@ print('-------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-i', '--input', required=True, metavar='dir_path',
-  help='''Path to ERCnet output files and GAF file which will be used in the GO analysis''')
+  help='''Path to ERCgo output''')
 
-parser.add_argument('-o', '--output', required=True, metavar='dir_path',
-  help='''Path to output folder where ERCnet GO analysis information will be written''')
+#parser.add_argument('-o', '--output', required=True, metavar='dir_path',
+#  help='''Path to output folder where ERCgo stats analysis and plots will be written''')
 
 args = parser.parse_args()
 argsDict = vars(args)
 
-outputDirectory = checkOutputDirectory(argsDict['output'])
+#outputDirectory = checkOutputDirectory(argsDict['output'])
 
 ##Collect analysis tables from ERCgo output directory
 print('---------------------------------------------------------------------------------------------------')
@@ -117,11 +155,17 @@ if len(sharedGOAnalysisFilesList) > 0:
   print('\n')
 
   print('---------------------------------------------------------------------------------------------------')
+  print('GO Score vs P_R2 Scatter Plot')
+  print('---------------------------------------------------------------------------------------------------')
+  print('\n')
+  scatterPlot(argsDict['input'] + '/GO_ANALYSIS_ERCnet_Network.tsv')
+  
+  print('---------------------------------------------------------------------------------------------------')
   print('Perform Wilcoxon Statistical Test')
   print('---------------------------------------------------------------------------------------------------')
   print('\n')
   
-  wilcoxonTest(sharedGOAnalysisFilesList)
+  #wilcoxonTest(sharedGOAnalysisFilesList)
   
   print('\n')
   print('###########################################')
