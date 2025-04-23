@@ -103,10 +103,11 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF = baseDF.copy(deep=True)
 
   #Clp genes and other genes of interest for plot coloring
-  interestGenes = ['ATCG00670', 'AT1G49970', 'AT1G12410', 'AT1G09130', 
-                   'AT4G17040', 'AT1G66670', 'AT4G12060', 'AT1G06950', 
-                   'AT5G53080', 'AT2G04270', 'AT1G26460', 'AT3G12380', 
-                   'AT3G60830', 'AT1G10510', 'AT3G19800', 'AT1G36320']
+  interestGenes = ['AT1G06950', 'AT5G53080', 'AT2G04270', 'AT1G26460', 'AT3G12380', 
+                'AT3G60830', 'AT1G10510', 'AT3G19800', 'AT1G36320']
+  
+  clpGenes = ['ATCG00670', 'AT1G49970', 'AT1G12410', 'AT1G09130', 
+                   'AT4G17040', 'AT1G66670', 'AT4G12060']
 
   ##Initialize new rows and variables to conduct calculations/analysis
   lengthGoAList = []
@@ -139,10 +140,16 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       geneA = lineData[0]
       geneB = lineData[1]
 
-      if geneA in interestGenes or geneB in interestGenes:
-        color.append('orange')
+      if geneA in clpGenes and geneB in clpGenes:
+        color.append('Clp-Clp interaction')
+      elif geneA in clpGenes and geneB in interestGenes:
+        color.append('Clp-interest interaction')
+      elif geneB in clpGenes and geneA in interestGenes:
+        color.append('Clp-interest interaction')
+      elif geneA in interestGenes and geneB in interestGenes:
+        color.append('Interest-Interest interaction')
       else:
-        color.append('blue')
+        color.append('Not of interest')
 
       #Get GO terms for gene A and gene B
       goListA = eval(lineData[6])
