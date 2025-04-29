@@ -83,6 +83,52 @@ def wilcoxonTest(sharedGoList):
   print(f"Z-score: {(u_stat - expected_u) / std_u}")
   print(f"P-value: {p_mw}")
 
+def getAGI(compID):
+  agiDict = {'AT1G49970' : 'CLPR1',
+              'AT1G12410'	: 'CLPR2',
+              'AT1G09130'	: 'CLPR3',
+              'AT4G17040'	: 'CLPR4',
+              'AT1G66670'	: 'CLPP3',
+              'AT5G45390'	: 'CLPP4',
+              'AT1G02560'	: 'CLPP5',
+              'AT1G11750'	: 'CLPP6',
+              'AT5G51070'	: 'CLPD',
+              'AT1G68660'	: 'CLPS',
+              'AT5G50920'	: 'CLPC1',
+              'AT3G48870'	: 'CLPC2',
+              'AT4G25370'	: 'CLPT1',
+              'AT4G12060'	: 'CLPT2',
+              'ATCG00670'	: 'CLPP1',
+              'AT3G14240' : 'SBT1.5',
+              'AT1G19370' : 'mp', #membrane protein;no name 
+              'AT3G47470' : 'LHCA4', 
+              'AT3G23620' : 'ARPF2', 
+              'AT4G11960' : 'PGRL1B',
+              'AT1G08130' : 'LIG1', 
+              'AT4G12800' : 'PSAL;RALFL24', 
+              'AT5G01590' : 'TIC56', 
+              'AT4G38590' : 'BGAL14', 
+              'AT1G09850' : 'XBCP3', 
+              'AT1G52220' : 'CURT1C', 
+              'AT2G40360' : 'ATPEIP1;ATPEP1;BOP1', 
+              'AT3G09050' : '8a7o', #8-amino-7-oxononanoate synthase 
+              'AT2G47990' : 'EDA13;EDA19;SWA1', 
+              'AT1G26090' : 'P-loop', #P-loop containing nucleoside triphosphate hydrolases superfamily protein
+              'AT4G23940' : 'ARC1;FTSHI1',
+              'AT3G60830' : 'ARP7;ATARP7', 
+              'AT1G26460' : 'TPR', #Tetratricopeptide repeat (TPR)-like superfamily protein 
+              'AT1G06950' : 'ATTIC110;TIC110', 
+              'AT2G04270' : 'RNASE E', # RNASE E;RNASE E/G-LIKE;RNE;RNEE/G
+              'AT1G10510' : 'emb2004', 
+              'AT5G53080' : 'WTG1',
+              'AT3G19800' : 'DUF177B', 
+              'AT3G12380' : 'ARP5;ATARP5', 
+              'AT1G36320' : 'CDB1L'
+              }
+  
+  agi = agiDict[compID]
+  return agi
+
 def scatterPlot(sharedGoTable):
   ercData = pandas.read_csv(sharedGoTable, sep='\t')
 
@@ -103,21 +149,24 @@ def scatterPlot(sharedGoTable):
   clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='Overlap_Score', y='P_R2', marker='o', color='orange',  zorder=2)
   clpClp = sns.scatterplot(data=ercData[clpClpMask], x='Overlap_Score', y='P_R2', marker='o', color='blue', zorder=2)
 
+  '''
   for point in range(len(noIntAbovePoint005DF)):
-    label = noIntAbovePoint005DF['COMP_GENE_A'][point] + '-' + noIntAbovePoint005DF['COMP_GENE_B'][point]
+    label = getAGI(noIntAbovePoint005DF['COMP_GENE_A'][point]) + '-' + getAGI(noIntAbovePoint005DF['COMP_GENE_B'][point])
     plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
-
+  '''
+  
   for point in range(len(intIntDF)):
-    label = intIntDF['COMP_GENE_A'][point] + '-' + intIntDF['COMP_GENE_B'][point]
+    label = getAGI(intIntDF['COMP_GENE_A'][point]) + '-' + getAGI(intIntDF['COMP_GENE_B'][point])
     plt.text(x=intIntDF['Overlap_Score'][point], y=intIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(clpIntDF)):
-    label = clpIntDF['COMP_GENE_A'][point] + '-' + clpIntDF['COMP_GENE_B'][point]
+    label = getAGI(clpIntDF['COMP_GENE_A'][point]) + '-' + getAGI(clpIntDF['COMP_GENE_B'][point])
     plt.text(x=clpIntDF['Overlap_Score'][point], y=clpIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(clpClpDF)):
-    label = clpClpDF['COMP_GENE_A'][point] + '-' + clpClpDF['COMP_GENE_B'][point]
+    label = getAGI(clpClpDF['COMP_GENE_A'][point]) + '-' + getAGI(clpClpDF['COMP_GENE_B'][point])
     plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+
 
   plt.show()
 
