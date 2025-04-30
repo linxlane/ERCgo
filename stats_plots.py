@@ -86,7 +86,8 @@ def wilcoxonTest(sharedGoList):
 def scatterPlot(sharedGoTable):
   ercData = pandas.read_csv(sharedGoTable, sep='\t')
 
-  allPoints = sns.scatterplot(data=ercData, x='Overlap_Score', y='P_R2', marker='X', color='green', zorder=1)
+  allPoints = sns.scatterplot(data=ercData, x='Overlap_Score', y='P_R2', marker='o', color='green', zorder=1)
+  plt.title('R2T')
 
   plt.show()
 
@@ -123,7 +124,11 @@ if len(sharedGOAnalysisFilesList) > 0:
   print('Analysis files found!')
   print('\n')
 
-  scatterPlot()
+  print('---------------------------------------------------------------------------------------------------')
+  print('GO Score vs P_R2 Scatter Plot')
+  print('---------------------------------------------------------------------------------------------------')
+  print('\n')
+  scatterPlot(argsDict['input'] + '/GO_ANALYSIS_ERCnet_Network.tsv')
 
   print('---------------------------------------------------------------------------------------------------')
   print('Perform Wilcoxon Statistical Test')
