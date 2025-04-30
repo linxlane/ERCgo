@@ -1,4 +1,5 @@
 import pandas
+import re
 
 def generateHogCompDict(path):
   df = pandas.read_csv(path, sep='\t', usecols=['HOG_ID', 'Comprehensive_ID'])
@@ -11,16 +12,14 @@ def lookup(hogGene, hogCompDict):
   return compGene
 
 
-def formatCompID(compGene):
-  if compGene.startswith('HOG'):
-    compGene = None
+def formatCompID(input):
+  if input.startswith('HOG'):
+    output = None
   
   else:
-    compGene = compGene[6:]
-    if len(compGene) > 10:
-      compGene = compGene[:9]
+    output = re.search(r'(?<=_)(AT)\w+', input).group() 
 
-  return compGene
+  return output
 
 
 def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
