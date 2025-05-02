@@ -96,11 +96,101 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
   return geneGoDF
 
 
+def colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes):
+  colorStr = ''
+  if geneA in allInterestGenes or geneB in allInterestGenes:
+    if geneA in alphaList:
+      colorStr += 'Alpha-'
+    elif geneA in betaList:
+      colorStr += 'Beta-'
+    elif geneA in rpnList:
+      colorStr += 'RPN-'
+    elif geneA in rptList:
+      colorStr += 'RPT-'
+    else:
+      colorStr += 'Other-'
+    
+    if geneB in alphaList:
+      colorStr += 'Alpha'
+    elif geneB in betaList:
+      colorStr += 'Beta'
+    elif geneB in rpnList:
+      colorStr += 'RPN'
+    elif geneB in rptList:
+      colorStr += 'RPT'
+    else:
+      colorStr += 'Other'
+
+  else:
+    colorStr = 'Not of interest'
+      
+  return colorStr
+
 def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName):
   print('4. Analyze shared GO terms intersection for each pair and construct table')
 
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
   sharedStatsDF = baseDF.copy(deep=True)
+
+  #color code genes
+  alphaList = ['AT2G05840',
+                'AT5G35590',
+                'AT1G16470',
+                'AT1G79210',
+                'AT3G22110',
+                'AT4G15165',
+                'AT3G51260',
+                'AT5G66140',
+                'AT1G53850',
+                'AT3G14290',
+                'AT1G47250',
+                'AT5G42790',
+                'AT2G27020']
+
+  betaList = ['AT4G31300',
+              'AT3G27430',
+              'AT5G40580',
+              'AT1G21720',
+              'AT1G77440',
+              'AT3G22630',
+              'AT4G14800',
+              'AT1G13060',
+              'AT3G26340',
+              'AT3G60820',
+              'AT1G56450']
+
+  rpnList = ['AT4G38630',
+              'AT5G23540',
+              'AT1G64520',
+              'AT5G42040',
+              'AT2G20580',
+              'AT4G28470',
+              'AT1G04810',
+              'AT2G32730',
+              'AT1G20200',
+              'AT1G75990',
+              'AT5G09900',
+              'AT5G64760',
+              'AT1G29150',
+              'AT4G24820',
+              'AT3G11270',
+              'AT5G05780',
+              'AT4G19006',
+              'AT5G45620']
+
+  rptList = ['AT1G53750',
+              'AT1G53780',
+              'AT2G20140',
+              'AT4G29040',
+              'AT5G58290',
+              'AT1G45000',
+              'AT5G43010',
+              'AT1G09100',
+              'AT3G05530',
+              'AT5G19990',
+              'AT5G20000']
+  
+  allInterestGenes = alphaList + betaList + rpnList + rptList
 
   ##Initialize new rows and variables to conduct calculations/analysis
   lengthGoAList = []
@@ -120,6 +210,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   formulaList = []
   termIntersectionCount = []
   intersectionFrequenciesList = []
+  color = []
 
   ##Iterate through gene pairs and GO terms and conduct analysis
   with open(geneGoPath, 'r') as genePairs:
@@ -129,6 +220,11 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       #Separate 'row' data
       lineData = line.strip().split('\t')
 
+      geneA = lineData[0]
+      geneB = lineData[1]
+
+      color.append(colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes))
+ 
       #Get GO terms for gene A and gene B
       goListA = eval(lineData[6])
       goListB = eval(lineData[7])
@@ -202,7 +298,8 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Length_SetA_and_SetB'] = totalSetLengthsList
   sharedStatsDF['Formula'] = formulaList
   sharedStatsDF['Overlap_Score'] = overlapScoreList
-  sharedStatsDF['label'] = edgeFileName
+  sharedStatsDF['Color'] = color
+  sharedStatsDF['File'] = edgeFileName
 
   print('  > Write analysis table to tsv')
   analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + edgeFileName + '.tsv'

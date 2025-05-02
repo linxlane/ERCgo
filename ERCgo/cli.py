@@ -9,7 +9,7 @@ def runParser():
   parser.add_argument('-o', '--output', required=True, metavar='dir_path',
     help='''Path to output folder where ERCnet GO analysis information will be written''')
   
-  parser.add_argument('-r', '--random', required=True, type = int, metavar='int',
+  parser.add_argument('-r', '--random', required=False, default=0, type = int, metavar='int',
     help='''Number of random replicates to generate and analyze.''')
   
   parser.add_argument('-m', '--rand_method', required=False, default='B', choices=['AB', 'B'],
