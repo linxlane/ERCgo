@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib as mpl
-from scipy.stats import mannwhitneyu, rankdata
+from scipy.stats import mannwhitneyu, rankdata, pearsonr
 
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
@@ -129,9 +129,15 @@ def getAGI(compID):
   agi = agiDict[compID]
   return agi
 
+def negLog10(col):
+  values = -np.log10(col)
+  return values
+
 def scatterPlot(sharedGoTable):
   ercData = pandas.read_csv(sharedGoTable, sep='\t')
-
+  ercData['negLog10'] = negLog10(ercData['P_Pval'])
+  #print(ercData.head())
+  exit
   clpClpMask = ercData['Color'] == 'Clp-Clp interaction'
   clpInterestMask = ercData['Color'] == 'Clp-interest interaction'
   interestInterestMask = ercData['Color'] == 'Interest-Interest interaction'
@@ -144,30 +150,37 @@ def scatterPlot(sharedGoTable):
   noIntAbovePoint005DF = ercData[noIntAbovePoint005].reset_index()
 
 
-  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='Overlap_Score', y='P_R2', marker='X', color='green', zorder=1)
-  interestInterest = sns.scatterplot(data=ercData[interestInterestMask], x='Overlap_Score', y='P_R2', marker='o', color='purple',  zorder=2)
-  clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='Overlap_Score', y='P_R2', marker='o', color='orange',  zorder=2)
-  clpClp = sns.scatterplot(data=ercData[clpClpMask], x='Overlap_Score', y='P_R2', marker='o', color='blue', zorder=2)
+  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='Overlap_Score', y='negLog10', marker='X', color='green', zorder=1)
+  interestInterest = sns.scatterplot(data=ercData[interestInterestMask], x='Overlap_Score', y='negLog10', marker='o', color='purple',  zorder=2)
+  clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='Overlap_Score', y='negLog10', marker='o', color='orange',  zorder=2)
+  clpClp = sns.scatterplot(data=ercData[clpClpMask], x='Overlap_Score', y='negLog10', marker='o', color='blue', zorder=2)
 
   '''
   for point in range(len(noIntAbovePoint005DF)):
     label = getAGI(noIntAbovePoint005DF['COMP_GENE_A'][point]) + '-' + getAGI(noIntAbovePoint005DF['COMP_GENE_B'][point])
-    plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
+    plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
   '''
   
   for point in range(len(intIntDF)):
     label = getAGI(intIntDF['COMP_GENE_A'][point]) + '-' + getAGI(intIntDF['COMP_GENE_B'][point])
-    plt.text(x=intIntDF['Overlap_Score'][point], y=intIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=intIntDF['Overlap_Score'][point], y=intIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(clpIntDF)):
     label = getAGI(clpIntDF['COMP_GENE_A'][point]) + '-' + getAGI(clpIntDF['COMP_GENE_B'][point])
-    plt.text(x=clpIntDF['Overlap_Score'][point], y=clpIntDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
+    plt.text(x=clpIntDF['Overlap_Score'][point], y=clpIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(clpClpDF)):
     label = getAGI(clpClpDF['COMP_GENE_A'][point]) + '-' + getAGI(clpClpDF['COMP_GENE_B'][point])
-    plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+    plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
 
+  plt.xscale('log')
 
+  '''
+  # Calculate Pearson correlation and p-value
+  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['negLog10'])
+  print(pearson_corr)
+  print(pearson_pval)
+  '''
   plt.show()
 
 ##Start of main stat and plotting script
@@ -204,15 +217,15 @@ if len(sharedGOAnalysisFilesList) > 0:
   print('\n')
 
   print('---------------------------------------------------------------------------------------------------')
-  print('GO Score vs P_R2 Scatter Plot')
+  print('GO Score vs negLog10 Scatter Plot')
   print('---------------------------------------------------------------------------------------------------')
   print('\n')
   scatterPlot(argsDict['input'] + '/GO_ANALYSIS_ERCnet_Network.tsv')
   
-  print('---------------------------------------------------------------------------------------------------')
-  print('Perform Wilcoxon Statistical Test')
-  print('---------------------------------------------------------------------------------------------------')
-  print('\n')
+  #print('---------------------------------------------------------------------------------------------------')
+  #print('Perform Wilcoxon Statistical Test')
+  #print('---------------------------------------------------------------------------------------------------')
+  #print('\n')
   
   #wilcoxonTest(sharedGOAnalysisFilesList)
   
