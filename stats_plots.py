@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib as mpl
-from scipy.stats import mannwhitneyu, rankdata
+from scipy.stats import mannwhitneyu, rankdata, pearsonr
 
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
@@ -84,7 +84,11 @@ def wilcoxonTest(sharedGoList):
   print(f"P-value: {p_mw}")
 
 def getAGI(compID, agiDict):
-  agi = agiDict[compID]
+  try:
+    agi = agiDict[compID]
+  except KeyError:
+    agi = 'Other'
+
   return agi
 
 def scatterPlot(sharedGoTable, agiDict):
@@ -114,22 +118,30 @@ def scatterPlot(sharedGoTable, agiDict):
 
   '''
   for point in range(len(rpnRpnDF)):
-    label = getAGI(rpnRpnDF['COMP_GENE_A'][point]) + '-' + getAGI(rpnRpnDF['COMP_GENE_B'][point])
+    label = getAGI(rpnRpnDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rpnRpnDF['COMP_GENE_B'][point], agiDict)
     plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(rptRptDF)):
-    label = getAGI(rptRptDF['COMP_GENE_A'][point]) + '-' + getAGI(rptRptDF['COMP_GENE_B'][point])
+    label = getAGI(rptRptDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rptRptDF['COMP_GENE_B'][point], agiDict)
     plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
 
   for point in range(len(betaBetaDF)):
-    label = getAGI(betaBetaDF['COMP_GENE_A'][point]) + '-' + getAGI(betaBetaDF['COMP_GENE_B'][point])
+    label = getAGI(betaBetaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(betaBetaDF['COMP_GENE_B'][point], agiDict)
     plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(alphaAlphaDF)):
-    label = getAGI(alphaAlphaDF['COMP_GENE_A'][point]) + '-' + getAGI(alphaAlphaDF['COMP_GENE_B'][point])
+    label = getAGI(alphaAlphaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(alphaAlphaDF['COMP_GENE_B'][point], agiDict)
     plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+  
+  for point in range(len(otherDF)):
+    label = getAGI(otherDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(otherDF['COMP_GENE_B'][point], agiDict)
+    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   '''
+  # Calculate Pearson correlation and p-value
+  #pearson_corr, pearson_pval = pearsonr(x, y)
+
+  plt.xscale('log')
 
   plt.title('BXB')
 
@@ -157,59 +169,59 @@ argsDict = vars(args)
 
 outputDirectory = checkOutputDirectory(argsDict['output'])
 
-agiDict = {'ARAT_AT2G05840.1_PACid_19639196' : 'Alpha1_AT2G05840',
-            'ARAT_AT5G35590.1_PACid_19666663' : 'Alpha1_AT5G35590',
-            'ARAT_AT1G16470.1_PACid_19651668' : 'Alpha2_AT1G16470',
-            'ARAT_AT1G79210.1_PACid_19650105' : 'Alpha2_AT1G79210',
-            'ARAT_AT3G22110.1_PACid_19663555' : 'Alpha3_AT3G22110',
-            'ARAT_AT4G15165.1_PACid_19648727' : 'Alpha3_AT4G15165',
-            'ARAT_AT3G51260.1_PACid_19664689' : 'Alpha4_AT3G51260',
-            'ARAT_AT5G66140.1_PACid_19672619' : 'Alpha4_AT5G66140',
-            'ARAT_AT1G53850.1_PACid_19652641' : 'Alpha5_AT1G53850',
-            'ARAT_AT3G14290.1_PACid_19658710' : 'Alpha5_AT3G14290',
-            'ARAT_AT1G47250.1_PACid_19658242' : 'Alpha_B26_AT1G47250',
-            'ARAT_AT5G42790.1_PACid_19670251' : 'Alpha6_AT5G42790',
-            'ARAT_AT2G27020.1_PACid_19640509' : 'Alpha7_AT2G27020',
-            'ARAT_AT4G31300.2_PACid_19646330' : 'Beta1_AT4G31300',
-            'ARAT_AT3G27430.2_PACid_19660822' : 'Beta2_AT3G27430',
-            'ARAT_AT5G40580.1_PACid_19671607' : 'Beta2_AT5G40580',
-            'ARAT_AT1G21720.1_PACid_19649188' : 'Beta3_AT1G21720',
-            'ARAT_AT1G77440.1_PACid_19656196' : 'Beta3_AT1G77440',
-            'ARAT_AT3G22630.1_PACid_19662898' : 'Beta4_AT3G22630',
-            'ARAT_AT4G14800.2_PACid_19644251' : 'Beta4_AT4G14800',
-            'ARAT_AT1G13060.2_PACid_19652499' : 'Beta5_AT1G13060',
-            'ARAT_AT3G26340.1_PACid_19658790' : 'Beta5_AT3G26340',
-            'ARAT_AT3G60820.1_PACid_19663843' : 'Beta6_AT3G60820',
-            'ARAT_AT1G56450.1_PACid_19658067' : 'Beta7_AT1G56450',
-            'ARAT_AT4G38630.1_PACid_19646282' : 'RPN10_AT4G38630',
-            'ARAT_AT5G23540.1_PACid_19666107' : 'RPN11_AT5G23540',
-            'ARAT_AT1G64520.1_PACid_19658060' : 'RPN12_AT1G64520',
-            'ARAT_AT5G42040.1_PACid_19665799' : 'RPN12_AT5G42040',
-            'ARAT_AT2G20580.1_PACid_19641906' : 'RPN1_AT2G20580',
-            'ARAT_AT4G28470.1_PACid_19645981' : 'RPN1_AT4G28470',
-            'ARAT_AT1G04810.1_PACid_19651161' : 'RPN2_AT1G04810',
-            'ARAT_AT2G32730.1_PACid_19639179' : 'RPN2_AT2G32730',
-            'ARAT_AT1G20200.1_PACid_19651422' : 'RPN3_AT1G20200',
-            'ARAT_AT1G75990.1_PACid_19652198' : 'RPN3_AT1G75990',
-            'ARAT_AT5G09900.3_PACid_19665897' : 'RPN5_AT5G09900',
-            'ARAT_AT5G64760.1_PACid_19668432' : 'RPN5_AT5G64760',
-            'ARAT_AT1G29150.1_PACid_19650043' : 'RPN6_AT1G29150',
-            'ARAT_AT4G24820.1_PACid_19647825' : 'RPN7_AT4G24820',
-            'ARAT_AT3G11270.1_PACid_19658597' : 'RPN8_AT3G11270',
-            'ARAT_AT5G05780.1_PACid_19670513' : 'RPN8_AT5G05780',
-            'ARAT_AT4G19006.1_PACid_19643829' : 'RPN9_AT4G19006',
-            'ARAT_AT5G45620.1_PACid_19668970' : 'RPN9_AT5G45620',
-            'ARAT_AT1G53750.1_PACid_19657550' : 'RPT1_AT1G53750',
-            'ARAT_AT1G53780.2_PACid_19652140' : 'RPT1_AT1G53780',
-            'ARAT_AT2G20140.1_PACid_19639123' : 'RPT2_AT2G20140',
-            'ARAT_AT4G29040.1_PACid_19646587' : 'RPT2_AT4G29040',
-            'ARAT_AT5G58290.1_PACid_19666361' : 'RPT3_AT5G58290',
-            'ARAT_AT1G45000.1_PACid_19650223' : 'RPT4_AT1G45000',
-            'ARAT_AT5G43010.1_PACid_19670324' : 'RPT4_AT5G43010',
-            'ARAT_AT1G09100.1_PACid_19653012' : 'RPT5_AT1G09100',
-            'ARAT_AT3G05530.1_PACid_19663123' : 'RPT5_AT3G05530',
-            'ARAT_AT5G19990.1_PACid_19667687' : 'RPT6_AT5G19990',
-            'ARAT_AT5G20000.1_PACid_19669291' : 'RPT6_AT5G20000'}
+agiDict = {'AT2G05840' : 'Alpha1_AT2G05840',
+            'AT5G35590' : 'Alpha1_AT5G35590',
+            'AT1G16470' : 'Alpha2_AT1G16470',
+            'AT1G79210' : 'Alpha2_AT1G79210',
+            'AT3G22110' : 'Alpha3_AT3G22110',
+            'AT4G15165' : 'Alpha3_AT4G15165',
+            'AT3G51260' : 'Alpha4_AT3G51260',
+            'AT5G66140' : 'Alpha4_AT5G66140',
+            'AT1G53850' : 'Alpha5_AT1G53850',
+            'AT3G14290' : 'Alpha5_AT3G14290',
+            'AT1G47250' : 'Alpha_B26_AT1G47250',
+            'AT5G42790' : 'Alpha6_AT5G42790',
+            'AT2G27020' : 'Alpha7_AT2G27020',
+            'AT4G31300' : 'Beta1_AT4G31300',
+            'AT3G27430' : 'Beta2_AT3G27430',
+            'AT5G40580' : 'Beta2_AT5G40580',
+            'AT1G21720' : 'Beta3_AT1G21720',
+            'AT1G77440' : 'Beta3_AT1G77440',
+            'AT3G22630' : 'Beta4_AT3G22630',
+            'AT4G14800' : 'Beta4_AT4G14800',
+            'AT1G13060' : 'Beta5_AT1G13060',
+            'AT3G26340' : 'Beta5_AT3G26340',
+            'AT3G60820' : 'Beta6_AT3G60820',
+            'AT1G56450' : 'Beta7_AT1G56450',
+            'AT4G38630' : 'RPN10_AT4G38630',
+            'AT5G23540' : 'RPN11_AT5G23540',
+            'AT1G64520' : 'RPN12_AT1G64520',
+            'AT5G42040' : 'RPN12_AT5G42040',
+            'AT2G20580' : 'RPN1_AT2G20580',
+            'AT4G28470' : 'RPN1_AT4G28470',
+            'AT1G04810' : 'RPN2_AT1G04810',
+            'AT2G32730' : 'RPN2_AT2G32730',
+            'AT1G20200' : 'RPN3_AT1G20200',
+            'AT1G75990' : 'RPN3_AT1G75990',
+            'AT5G09900' : 'RPN5_AT5G09900',
+            'AT5G64760' : 'RPN5_AT5G64760',
+            'AT1G29150' : 'RPN6_AT1G29150',
+            'AT4G24820' : 'RPN7_AT4G24820',
+            'AT3G11270' : 'RPN8_AT3G11270',
+            'AT5G05780' : 'RPN8_AT5G05780',
+            'AT4G19006' : 'RPN9_AT4G19006',
+            'AT5G45620' : 'RPN9_AT5G45620',
+            'AT1G53750' : 'RPT1_AT1G53750',
+            'AT1G53780' : 'RPT1_AT1G53780',
+            'AT2G20140' : 'RPT2_AT2G20140',
+            'AT4G29040' : 'RPT2_AT4G29040',
+            'AT5G58290' : 'RPT3_AT5G58290',
+            'AT1G45000' : 'RPT4_AT1G45000',
+            'AT5G43010' : 'RPT4_AT5G43010',
+            'AT1G09100' : 'RPT5_AT1G09100',
+            'AT3G05530' : 'RPT5_AT3G05530',
+            'AT5G19990' : 'RPT6_AT5G19990',
+            'AT5G20000' : 'RPT6_AT5G20000'}
 
 ##Collect analysis tables from ERCgo output directory
 print('---------------------------------------------------------------------------------------------------')
