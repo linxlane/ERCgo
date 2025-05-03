@@ -26,12 +26,12 @@ def checkOutputDirectory(outPath):
   return outPath
 
 def wilcoxonTest(sharedGoList):
-  ercData = pandas.read_csv(sharedGoList[0], sep='\t', usecols=['Overlap_Score'])
-  ercNetDist = list(ercData['Overlap_Score'])
+  ercData = pandas.read_csv(sharedGoList[0], sep='\t', usecols=['overlap_log'])
+  ercNetDist = list(ercData['overlap_log'])
   #print(ercDataList)
 
-  randData = pandas.read_csv(sharedGoList[1], sep='\t', usecols=['Overlap_Score'])
-  randDist = list(randData['Overlap_Score'])
+  randData = pandas.read_csv(sharedGoList[1], sep='\t', usecols=['overlap_log'])
+  randDist = list(randData['overlap_log'])
   #print(randDataList)
 
   # Mann-Whitney U Test
@@ -133,15 +133,20 @@ def negLog10(col):
   values = -np.log10(col)
   return values
 
+def logZero(col):
+  values = -np.log10(col, out=np.zeros_like(col, dtype=np.float64), where=(col!=0))
+  return values
+
 def scatterPlot(sharedGoTable):
   ercData = pandas.read_csv(sharedGoTable, sep='\t')
+  ercData['overlap_log'] = logZero(ercData['Overlap_Score'])
   ercData['negLog10'] = negLog10(ercData['P_Pval'])
-  #print(ercData.head())
-  exit
+  print(ercData.head(50))
+  
   clpClpMask = ercData['Color'] == 'Clp-Clp interaction'
   clpInterestMask = ercData['Color'] == 'Clp-interest interaction'
   interestInterestMask = ercData['Color'] == 'Interest-Interest interaction'
-  noIntAbovePoint005 = ercData['Overlap_Score'] > 0.005
+  noIntAbovePoint005 = ercData['overlap_log'] > 0.005
   noInterestMask = ercData['Color'] == 'Not of interest'
 
   clpClpDF = ercData[clpClpMask].reset_index()
@@ -150,34 +155,32 @@ def scatterPlot(sharedGoTable):
   noIntAbovePoint005DF = ercData[noIntAbovePoint005].reset_index()
 
 
-  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='Overlap_Score', y='negLog10', marker='X', color='green', zorder=1)
-  interestInterest = sns.scatterplot(data=ercData[interestInterestMask], x='Overlap_Score', y='negLog10', marker='o', color='purple',  zorder=2)
-  clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='Overlap_Score', y='negLog10', marker='o', color='orange',  zorder=2)
-  clpClp = sns.scatterplot(data=ercData[clpClpMask], x='Overlap_Score', y='negLog10', marker='o', color='blue', zorder=2)
+  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='overlap_log', y='negLog10', marker='X', color='green', zorder=1)
+  interestInterest = sns.scatterplot(data=ercData[interestInterestMask], x='overlap_log', y='negLog10', marker='o', color='purple',  zorder=2)
+  clpInterest = sns.scatterplot(data=ercData[clpInterestMask], x='overlap_log', y='negLog10', marker='o', color='orange',  zorder=2)
+  clpClp = sns.scatterplot(data=ercData[clpClpMask], x='overlap_log', y='negLog10', marker='o', color='blue', zorder=2)
 
   '''
   for point in range(len(noIntAbovePoint005DF)):
     label = getAGI(noIntAbovePoint005DF['COMP_GENE_A'][point]) + '-' + getAGI(noIntAbovePoint005DF['COMP_GENE_B'][point])
-    plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
+    plt.text(x=noIntAbovePoint005DF['overlap_log'][point], y=noIntAbovePoint005DF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='green')
   '''
   
   for point in range(len(intIntDF)):
     label = getAGI(intIntDF['COMP_GENE_A'][point]) + '-' + getAGI(intIntDF['COMP_GENE_B'][point])
-    plt.text(x=intIntDF['Overlap_Score'][point], y=intIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=intIntDF['overlap_log'][point], y=intIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(clpIntDF)):
     label = getAGI(clpIntDF['COMP_GENE_A'][point]) + '-' + getAGI(clpIntDF['COMP_GENE_B'][point])
-    plt.text(x=clpIntDF['Overlap_Score'][point], y=clpIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
+    plt.text(x=clpIntDF['overlap_log'][point], y=clpIntDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(clpClpDF)):
     label = getAGI(clpClpDF['COMP_GENE_A'][point]) + '-' + getAGI(clpClpDF['COMP_GENE_B'][point])
-    plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
-
-  plt.xscale('log')
+    plt.text(x=clpClpDF['overlap_log'][point], y=clpClpDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
 
   '''
   # Calculate Pearson correlation and p-value
-  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['negLog10'])
+  pearson_corr, pearson_pval = pearsonr(ercData['overlap_log'], ercData['negLog10'])
   print(pearson_corr)
   print(pearson_pval)
   '''
