@@ -91,57 +91,74 @@ def getAGI(compID, agiDict):
 
   return agi
 
-def scatterPlot(sharedGoTable, agiDict):
-  ercData = pandas.read_csv(sharedGoTable, sep='\t')
+def trendline(ercData):
+  # Calculate Pearson correlation and p-value
+  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['P_R2'])
+  print('pearson_corr: ' + str(pearson_corr))
+  print('pearson_pval: ' + str(pearson_pval))
 
-  alphaAlphaMask = ercData['Color'] == 'Alpha-Alpha'
-  betaBetaMask = ercData['Color'] == 'Beta-Beta'
-  rpnRpnMask = ercData['Color'] == 'RPN-RPN'
-  rptRptMask = ercData['Color'] == 'RPT-RPT'
-  otherMask = ercData['Color'].str.contains('Other')
-  noInterestMask = ercData['Color'] == 'Not of interest'
+def negLog10(col):
+  values = -np.log10(col)
+  return values
 
-  alphaAlphaDF = ercData[alphaAlphaMask].reset_index()
-  betaBetaDF = ercData[betaBetaMask].reset_index()
-  rpnRpnDF = ercData[rpnRpnMask].reset_index()
-  rptRptDF = ercData[rptRptMask].reset_index()
-  otherDF = ercData[otherMask].reset_index()
+def scatterPlot(ercData, agiDict):
+  #print(ercData.head(50))
+  #print('------------------------------------')
+
+  smallValue = 0.00001
+  replaceZerosDF = ercData.replace(to_replace=0, value=smallValue)
+  #print(replaceZerosDF.head(50))
+
+  replaceZerosDF['negLog10'] = negLog10(replaceZerosDF['P_R2'])
+
+  alphaAlphaMask = replaceZerosDF['Color'] == 'Alpha-Alpha'
+  betaBetaMask = replaceZerosDF['Color'] == 'Beta-Beta'
+  rpnRpnMask = replaceZerosDF['Color'] == 'RPN-RPN'
+  rptRptMask = replaceZerosDF['Color'] == 'RPT-RPT'
+  otherMask = replaceZerosDF['Color'].str.contains('Other')
+  noInterestMask = replaceZerosDF['Color'] == 'Not of interest'
+
+  alphaAlphaDF = replaceZerosDF[alphaAlphaMask].reset_index()
+  betaBetaDF = replaceZerosDF[betaBetaMask].reset_index()
+  rpnRpnDF = replaceZerosDF[rpnRpnMask].reset_index()
+  rptRptDF = replaceZerosDF[rptRptMask].reset_index()
+  otherDF = replaceZerosDF[otherMask].reset_index()
 
 
 
-  allPoints = sns.scatterplot(data=ercData[noInterestMask], x='Overlap_Score', y='P_R2', marker='X', color='green', zorder=1)
-  rprRprPlot = sns.scatterplot(data=ercData[rptRptMask], x='Overlap_Score', y='P_R2', marker='o', color='yellow',  zorder=2)
-  rpnRpnPlot = sns.scatterplot(data=ercData[rpnRpnMask], x='Overlap_Score', y='P_R2', marker='o', color='purple',  zorder=2)
-  betaBetaPlot = sns.scatterplot(data=ercData[betaBetaMask], x='Overlap_Score', y='P_R2', marker='o', color='orange',  zorder=2)
-  alphaAlphaPlot = sns.scatterplot(data=ercData[alphaAlphaMask], x='Overlap_Score', y='P_R2', marker='o', color='blue', zorder=2)
-  otherPlot = sns.scatterplot(data=ercData[otherMask], x='Overlap_Score', y='P_R2', marker='o', color='red', zorder=2)
+  allPoints = sns.scatterplot(data=replaceZerosDF[noInterestMask], x='Overlap_Score', y='negLog10', marker='X', color='green', zorder=1)
+  rprRprPlot = sns.scatterplot(data=replaceZerosDF[rptRptMask], x='Overlap_Score', y='negLog10', marker='o', color='yellow',  zorder=2)
+  rpnRpnPlot = sns.scatterplot(data=replaceZerosDF[rpnRpnMask], x='Overlap_Score', y='negLog10', marker='o', color='purple',  zorder=2)
+  betaBetaPlot = sns.scatterplot(data=replaceZerosDF[betaBetaMask], x='Overlap_Score', y='negLog10', marker='o', color='orange',  zorder=2)
+  alphaAlphaPlot = sns.scatterplot(data=replaceZerosDF[alphaAlphaMask], x='Overlap_Score', y='negLog10', marker='o', color='blue', zorder=2)
+  otherPlot = sns.scatterplot(data=replaceZerosDF[otherMask], x='Overlap_Score', y='negLog10', marker='o', color='red', zorder=2)
 
   '''
   for point in range(len(rpnRpnDF)):
     label = getAGI(rpnRpnDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rpnRpnDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(rptRptDF)):
     label = getAGI(rptRptDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rptRptDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
 
   for point in range(len(betaBetaDF)):
     label = getAGI(betaBetaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(betaBetaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
+    plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(alphaAlphaDF)):
     label = getAGI(alphaAlphaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(alphaAlphaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+    plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   
   for point in range(len(otherDF)):
     label = getAGI(otherDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(otherDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['negLog10'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   '''
-  # Calculate Pearson correlation and p-value
-  #pearson_corr, pearson_pval = pearsonr(x, y)
 
   plt.xscale('log')
+  
+  plt.ylabel('-log10(P_R2)')
 
   plt.title('BXB')
 
@@ -161,13 +178,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', required=True, metavar='dir_path',
   help='''Path to ERCnet output files and GAF file which will be used in the GO analysis''')
 
-parser.add_argument('-o', '--output', required=True, metavar='dir_path',
-  help='''Path to output folder where ERCnet GO analysis information will be written''')
+#parser.add_argument('-o', '--output', required=True, metavar='dir_path',
+#  help='''Path to output folder where ERCnet GO analysis information will be written''')
 
 args = parser.parse_args()
 argsDict = vars(args)
 
-outputDirectory = checkOutputDirectory(argsDict['output'])
+#outputDirectory = checkOutputDirectory(argsDict['output'])
 
 agiDict = {'AT2G05840' : 'Alpha1_AT2G05840',
             'AT5G35590' : 'Alpha1_AT5G35590',
@@ -233,12 +250,15 @@ if len(sharedGOAnalysisFilesList) > 0:
   sharedGOAnalysisFilesList.sort()
   print('Analysis files found!')
   print('\n')
+  ercData = pandas.read_csv(sharedGOAnalysisFilesList[0], sep='\t')
+
+  trendline(ercData)
 
   print('---------------------------------------------------------------------------------------------------')
   print('GO Score vs P_R2 Scatter Plot')
   print('---------------------------------------------------------------------------------------------------')
   print('\n')
-  scatterPlot(argsDict['input'] + '/GO_ANALYSIS_ERCnet_Network.tsv', agiDict)
+  scatterPlot(ercData, agiDict)
 
   print('---------------------------------------------------------------------------------------------------')
   print('Perform Wilcoxon Statistical Test')
