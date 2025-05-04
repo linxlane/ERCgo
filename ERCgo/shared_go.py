@@ -40,10 +40,14 @@ def generateSharedGOTable(masterOutPath, edgeFilePath, hogCompDict, geneGoDict, 
 
   ##Get GO terms for each gene in gene pairs in edge file, write table to tsv
   print('3. Collect GO terms for each gene in a pair and construct table')
-  compPairsGoWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B]_TABLE_' + edgeFileName + '.tsv'
+  compPairsGoWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Length_Go_A, Length_Go_B]_TABLE_' + edgeFileName + '.tsv'
   genePairWithGoDF = genePairGO(compPairsNaPath, geneGoDict, compPairsGoWritePath)
 
-  return genePairWithGoDF, compPairsGoWritePath, goTermFreq
+  ##Drop rows where the number of GO terms for either geneA or geneB is zero
+  dropZeroGoWritePath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, GO_TERMS_A, GO_TERMS_B, Length_Go_A, Length_Go_B]_TABLE_DROP_ZEROS_' + edgeFileName + '.tsv'
+  genePairWithGoDropDF = dropZeros(genePairWithGoDF, dropZeroGoWritePath)
+
+  return genePairWithGoDropDF, dropZeroGoWritePath, goTermFreq
 
 
 def genePairGO(genePairsPath, goTermsDict, outputPath):
@@ -86,15 +90,27 @@ def genePairGO(genePairsPath, goTermsDict, outputPath):
       matchingGoList.append(goTermsA)
       matchingGoList.append(goTermsB)
 
+      #Append number of GO terms for each gene
+      matchingGoList.append(len(goTermsA))
+      matchingGoList.append(len(goTermsB))
+
       #Append 'new row' to table
       geneGOList.append(matchingGoList)
 
   ##Write table to file
-  geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
-  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv')
+  geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B', 'Length_Go_A', 'Length_Go_B'])
+  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B, Length_Go_A, Length_Go_B] table to tsv')
   geneGoDF.to_csv(outputPath, sep='\t', index=False)
   return geneGoDF
 
+
+def dropZeros(df, outputPath):
+  nonZeroRowsA = df.loc[df['Length_Go_A'] != 0]
+  nonZeroRowsAB = nonZeroRowsA.loc[nonZeroRowsA['Length_Go_B'] != 0]
+
+  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B, Length_Go_A, Length_Go_B] table to tsv')
+  nonZeroRowsAB.to_csv(outputPath, sep='\t', index=False)
+  return nonZeroRowsAB
 
 def colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes):
   colorStr = ''
@@ -193,8 +209,6 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   allInterestGenes = alphaList + betaList + rpnList + rptList
 
   ##Initialize new rows and variables to conduct calculations/analysis
-  lengthGoAList = []
-  lengthGoBList = []
   goTermIntersectionList = []
   sharedGoLen = []
   frequenciesA = []
@@ -232,10 +246,6 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       #Convert GO term data to sets
       goSetA = set(goListA)
       goSetB = set(goListB)
-
-      #Get the length of each GO term set and append to appropriate column 
-      lengthGoAList.append(len(goListA))
-      lengthGoBList.append(len(goListB))
 
       #Determine intersection, if any, of GO terms for each gene in the gene pair
       goTermIntersection = goSetA & goSetB
@@ -287,8 +297,6 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       overlapScoreList.append(overlapScore)
       overlapScore = 0.0
 
-  sharedStatsDF['Length_Go_A'] = lengthGoAList
-  sharedStatsDF['Length_Go_B'] = lengthGoBList
   sharedStatsDF['Shared_GO'] = goTermIntersectionList
   sharedStatsDF['Number_of_Shared_GO'] = sharedGoLen  
   sharedStatsDF['Population_Frequencies_A'] = frequenciesA_List
