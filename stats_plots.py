@@ -93,7 +93,7 @@ def getAGI(compID, agiDict):
 
 def trendline(ercData):
   # Calculate Pearson correlation and p-value
-  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['P_R2'])
+  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['P_Pval'])
   print('pearson_corr: ' + str(pearson_corr))
   print('pearson_pval: ' + str(pearson_pval))
 
@@ -105,11 +105,12 @@ def scatterPlot(ercData, agiDict):
   #print(ercData.head(50))
   #print('------------------------------------')
 
-  smallValue = 0.00001
+  smallValue = ercData['Overlap_Score'][ercData['Overlap_Score'] != 0].min()
+  print(smallValue)
   replaceZerosDF = ercData.replace(to_replace=0, value=smallValue)
   #print(replaceZerosDF.head(50))
 
-  replaceZerosDF['negLog10'] = negLog10(replaceZerosDF['P_R2'])
+  replaceZerosDF['negLog10'] = negLog10(replaceZerosDF['P_Pval'])
 
   alphaAlphaMask = replaceZerosDF['Color'] == 'Alpha-Alpha'
   betaBetaMask = replaceZerosDF['Color'] == 'Beta-Beta'
@@ -158,7 +159,7 @@ def scatterPlot(ercData, agiDict):
 
   plt.xscale('log')
   
-  plt.ylabel('-log10(P_R2)')
+  plt.ylabel('-log10(P_Pval)')
 
   plt.title('BXB')
 
@@ -255,7 +256,7 @@ if len(sharedGOAnalysisFilesList) > 0:
   trendline(ercData)
 
   print('---------------------------------------------------------------------------------------------------')
-  print('GO Score vs P_R2 Scatter Plot')
+  print('GO Score vs P_Pval Scatter Plot')
   print('---------------------------------------------------------------------------------------------------')
   print('\n')
   scatterPlot(ercData, agiDict)
