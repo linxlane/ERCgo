@@ -1,4 +1,5 @@
 import pandas
+import re
 
 def generateHogCompDict(path):
   df = pandas.read_csv(path, sep='\t', usecols=['HOG_ID', 'Comprehensive_ID'])
@@ -11,16 +12,13 @@ def lookup(hogGene, hogCompDict):
   return compGene
 
 
-def formatCompID(compGene):
-  if compGene.startswith('HOG'):
-    compGene = None
-  
+def formatCompID(inputID):
+  if inputID.startswith('HOG'):
+    output = None
   else:
-    compGene = compGene[6:]
-    if len(compGene) > 10:
-      compGene = compGene[:9]
+    output = re.search(r'(?<=_)(AT)\w+', inputID).group() 
 
-  return compGene
+  return output
 
 
 def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
@@ -59,5 +57,6 @@ def dropNaRows(hogCompDF_FULL, hogCompNaPath, compPairsNaPath):
   print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
   hogCompDF_DropNa.to_csv(hogCompNaPath, sep='\t', index=False)
   print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
-  hogCompDF_DropNa.to_csv(compPairsNaPath, sep='\t', index=False, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval'])
+  hogCompDF_DropNa.drop(['HOG_GENE_A', 'HOG_GENE_B'], axis=1, inplace=True)
+  hogCompDF_DropNa.to_csv(compPairsNaPath, sep='\t', index=False)
   return hogCompDF_DropNa

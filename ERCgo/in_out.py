@@ -2,6 +2,7 @@ import glob
 import sys
 import os
 import shutil
+import hog_comp_ids
 
 def findEdgeFile(directory):
   search_result = glob.glob(directory + '/*edges*')
@@ -57,3 +58,38 @@ def checkOutputDirectory(outPath):
     print('Successful', end='')
     
   return outPath
+
+def formatErcNetDataHits(argsDict, intermediateFilesPath):
+  print('---------------------------------------------------------------------------------------------------')
+  print('Preparing ERCnet output for ERC hit GO analysis')
+  print('---------------------------------------------------------------------------------------------------')
+  print('Searching for ERCnet output files...')
+  #ERCnet ouput edge file path
+  edgeFilePath = findEdgeFile(argsDict['input'])
+  #ERCnet output vertices file path
+  verticesFilePath = findVerticesFile(argsDict['input'])
+
+  print('> Generating dictionary of {HOG_ID:Comprehensive_ID} to convert edge file HOG IDs to comprehensive IDs')
+  ##Create dictionary of hog id equivalent comp ids for edge file conversion
+  hogCompDict = hog_comp_ids.generateHogCompDict(verticesFilePath)
+
+  ##Convert HOG and comp ids
+  print('1. Convert and prepare gene pairs for analysis')
+  print('  > Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]')
+  hogCompPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_FULL_' + argsDict['job_name'] + '.tsv'
+  #Create and write tsv that contains equivalent HOG-COMP id values
+  geneLookupDF_FULL = hog_comp_ids.generateHogCompTable(edgeFilePath, hogCompDict, hogCompPath)
+
+  print('  > Append R2 and pvalues from edge file')
+  print('    > Generate table of [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval]')
+  hogCompNetStatsPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval]_FULL_' + argsDict['job_name'] + '.tsv'
+  hogCompNetStatsDF_Full = hog_comp_ids.appendStats(geneLookupDF_FULL, edgeFilePath, hogCompNetStatsPath)
+
+  print('  > Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
+  hogCompNaPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_DROP_NA_' + argsDict['job_name'] + '.tsv'
+  compPairsNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA_' + argsDict['job_name'] + '.tsv'
+  hogCompNetStatsDF_DROP = hog_comp_ids.dropNaRows(hogCompNetStatsDF_Full, hogCompNaPath, compPairsNaPath)
+
+  print(hogCompNetStatsDF_DROP.head())
+
+  return hogCompNetStatsDF_DROP

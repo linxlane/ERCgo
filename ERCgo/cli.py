@@ -10,6 +10,11 @@ def runParser():
   parser.add_argument('-i', '--input', required=True, metavar='dir_path',
     help='''Path to ERCnet output files and GAF file which will be used in the GO analysis''')
   
+  parser.add_argument('-a', '--analysis', required=True, choices=['full', 'hits', 'both'],
+    help='''Specifies type of ERCgo analysis. 'full' will analyze entire ERCnet analysis and requires the output ERC_results tsv from an ERCnet run.
+            'hits' will analyze only the hits of an ERCnet run. This mode requires the edges and vertices files. 'both' performs a GO analysis on the full ERCnet output
+            and the hit data.''')
+  
   parser.add_argument('-o', '--output', required=False, metavar='dir_path', default=None,
     help='''Path where new directory for ERCgo output will be created with the job name. 
             If not included, it will be written in the ERCgo directory.

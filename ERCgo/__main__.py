@@ -2,7 +2,6 @@ import cli
 import in_out
 import gaf
 import shared_go
-import hog_comp_ids
 import os
 
 #######################
@@ -26,15 +25,6 @@ args = cli.runParser()
 ##Generate dictionary of flags parsed in cli.py
 argsDict = vars(args)
 
-##Fetch ERCnet files and GAF from parser input directory
-print('Searching for ERCnet output files...')
-#ERCnet ouput edge file
-ercNetEdgeFilePath = in_out.findEdgeFile(argsDict['input'])
-#ERCnet output vertices file
-ercNetVerticesFilePath = in_out.findVerticesFile(argsDict['input'])
-#GAF file
-gafFilePath = in_out.findGafFile(argsDict['input'])
-
 print('\n')
 
 ##Create new directory with the job_name where ERCgo output will be written
@@ -47,6 +37,10 @@ else:
   outputDir = argsDict['output']
 masterOutPath = in_out.checkOutputDirectory(outputDir + '/' + argsDict['job_name'])
 
+#Make directory to write conversion files for later reference
+intermediateFilesPath = masterOutPath + '/Intermediate_Files_' + argsDict['job_name']
+os.makedirs(intermediateFilesPath)
+
 print('\n\n')
 
 ###############
@@ -58,45 +52,22 @@ print('Processing GAF')
 print('---------------------------------------------------------------------------------------------------')
 
 ##Create dictionary of genes and associated GO terms by reading and processing GAF
+#GAF file
+gafFilePath = in_out.findGafFile(argsDict['input'])
 geneGoDict = gaf.processGaf(gafFilePath, masterOutPath)
 print('\n')
 
-#################################
-# Create HOG_COMP ID dictionary #
-#################################
+########################################
+# Prep ERCnet hits output for analysis #
+########################################
 
-print('---------------------------------------------------------------------------------------------------')
-print('Create HOG-COMP ID dictionary')
-print('---------------------------------------------------------------------------------------------------')
+if argsDict['analysis'] == 'hits':
+  in_out.formatErcNetDataHits(argsDict, intermediateFilesPath)
 
-print('> Generating dictionary of {HOG_ID:Comprehensive_ID} to convert edge file HOG IDs to comprehensive IDs')
-##Create dictionary of hog id equivalent comp ids for edge file conversion
-hogCompDict = hog_comp_ids.generateHogCompDict(ercNetVerticesFilePath)
-
-print('\n')
-
-##################
-# ERCgo Analysis #
-##################
-
-print('=======================================================================================================')
-print('Prepartion complete. Beginning ERCgo analysis...')
-print('=======================================================================================================')
-
-##ERCnet data
-print('---------------------------------------------------------------------------------------------------')
-print('Starting analysis of ERCnet data')
-print('---------------------------------------------------------------------------------------------------')
-
-edgeFileName = 'ERCnet_Network'
-print('Now processing: ' + edgeFileName)
-
-#Get GO terms for each gene pair and create table
-geneGoDF, writePath, frequencies = shared_go.generateSharedGOTable(masterOutPath, ercNetEdgeFilePath, hogCompDict, geneGoDict, edgeFileName)
-
-#Analyze GO term sets returned for each gene pair, find intersection, and calculate score
-shared_go.analyzeSharedGo(geneGoDF, masterOutPath, writePath, frequencies, edgeFileName)
-print('\n')
+elif argsDict['analysis'] == 'full':
+  print('Full')
+elif argsDict['analysis'] == 'both':
+  print('Both')
 
 print('#####################')
 print('Go analysis complete! ')
