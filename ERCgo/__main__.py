@@ -37,9 +37,15 @@ gafFilePath = in_out.findGafFile(argsDict['input'])
 
 print('\n')
 
-##Check for existing output directory, create a directory if it does not exist
+##Create new directory with the job_name where ERCgo output will be written
+#Check for user defined output, otherwise get ERCgo path
+#Check for existing directory at the output/job_name path, delete if it exists to start fresh
 print('Checking and resolving output cli argument if needed...')
-masterOutPath = in_out.checkOutputDirectory(argsDict['output'])
+if argsDict['output'] is None:
+  outputDir = os.getcwd()
+else:
+  outputDir = argsDict['output']
+masterOutPath = in_out.checkOutputDirectory(outputDir + '/' + argsDict['job_name'])
 
 print('\n\n')
 
