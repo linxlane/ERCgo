@@ -1,6 +1,5 @@
 import cli
 import in_out
-import randomize
 import gaf
 import shared_go
 import hog_comp_ids
@@ -70,32 +69,6 @@ hogCompDict = hog_comp_ids.generateHogCompDict(ercNetVerticesFilePath)
 
 print('\n')
 
-##################################
-# Generate Randomized replicates #
-##################################
-
-if argsDict['random'] == 0:
-  print('---------------------------------------------------------------------------------------------------')
-  print('The -r flag was set to zero. Random replicates will not be generated or analyzed in the run.')
-  print('---------------------------------------------------------------------------------------------------')
-
-else:
-  print('---------------------------------------------------------------------------------------------------')
-  print('Generating randomized copies of ERCnet edge file for later statistical analysis')
-  print('---------------------------------------------------------------------------------------------------')
-
-  ##Create directory for randomized files
-  print('Making directory for writing randomized edge files...', flush=True, end='')
-  randDirPath = randomize.randomDirectory(masterOutPath)
-
-  print('\n')
-
-  ##Make copies of edge file with randomized B column, write in randomized directory
-  print('Starting generation of random replicate(s)')
-  randomize.generateRandomizedFiles(ercNetEdgeFilePath, randDirPath, argsDict['random'], argsDict['rand_method'])
-
-  print('\n')
-
 ##################
 # ERCgo Analysis #
 ##################
@@ -103,27 +76,6 @@ else:
 print('=======================================================================================================')
 print('Prepartion complete. Beginning ERCgo analysis...')
 print('=======================================================================================================')
-
-##Random Replicates, if -r is not 0
-if argsDict['random'] != 0:
-  print('---------------------------------------------------------------------------------------------------')
-  print('Starting analysis of random replicate(s)')
-  print('---------------------------------------------------------------------------------------------------')
-
-  #Get all randomized edge files and return a list for iteration
-  randEdgeFilesList = randomize.collectRandomizedEdgeFiles(randDirPath)
-
-  ##Process each randomized edge file
-  for randEdgeFile in randEdgeFilesList:
-    print('Now processing: ' + randEdgeFile)
-    edgeFileName = os.path.basename(randEdgeFile)
-
-    #Get GO terms for each gene pair and create table
-    geneGoDF, writePath, frequencies = shared_go.generateSharedGOTable(masterOutPath, randEdgeFile, hogCompDict, geneGoDict, edgeFileName)
-    
-    #Analyze GO term sets returned for each gene pair, find intersection, and calculate score
-    shared_go.analyzeSharedGo(geneGoDF, masterOutPath, writePath, frequencies, edgeFileName)
-    print('\n')
 
 ##ERCnet data
 print('---------------------------------------------------------------------------------------------------')
