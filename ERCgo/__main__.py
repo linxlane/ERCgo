@@ -3,6 +3,7 @@ import in_out
 import gaf
 import shared_go
 import os
+import population
 
 #######################
 # Start of ERCgo main #
@@ -62,13 +63,17 @@ print('\n')
 ########################################
 
 if argsDict['analysis'] == 'hits':
-  in_out.formatErcNetDataHits(argsDict, intermediateFilesPath)
-
+  genePairsDropNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA_' + argsDict['job_name'] + '.tsv'
+  genePairsDF = in_out.formatErcNetDataHits(argsDict, intermediateFilesPath, genePairsDropNaPath)
+  goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, masterOutPath, argsDict['job_name'])
+  genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsDropNaPath, geneGoDict, intermediateFilesPath, argsDict['job_name'])
+  shared_go.analyzeSharedGo(genePairsGoDF, masterOutPath, genePairsGoPath, goTermsFreq, argsDict['job_name'])
 elif argsDict['analysis'] == 'full':
   print('Full')
 elif argsDict['analysis'] == 'both':
   print('Both')
 
+print('\n')
 print('#####################')
 print('Go analysis complete! ')
 print('#####################')

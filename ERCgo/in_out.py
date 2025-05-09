@@ -59,7 +59,7 @@ def checkOutputDirectory(outPath):
     
   return outPath
 
-def formatErcNetDataHits(argsDict, intermediateFilesPath):
+def formatErcNetDataHits(argsDict, intermediateFilesPath, genePairsDropNaPath):
   print('---------------------------------------------------------------------------------------------------')
   print('Preparing ERCnet output for ERC hit GO analysis')
   print('---------------------------------------------------------------------------------------------------')
@@ -87,9 +87,8 @@ def formatErcNetDataHits(argsDict, intermediateFilesPath):
 
   print('  > Drop rows that contain None values, ie there was no COMP_ID match for a given HOG_ID')
   hogCompNaPath = intermediateFilesPath + '/[HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B]_DROP_NA_' + argsDict['job_name'] + '.tsv'
-  compPairsNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA_' + argsDict['job_name'] + '.tsv'
-  hogCompNetStatsDF_DROP = hog_comp_ids.dropNaRows(hogCompNetStatsDF_Full, hogCompNaPath, compPairsNaPath)
+  hogCompNetStatsDF_DROP = hog_comp_ids.dropNaRows(hogCompNetStatsDF_Full, hogCompNaPath, genePairsDropNaPath)
 
-  print(hogCompNetStatsDF_DROP.head())
+  #print(hogCompNetStatsDF_DROP.head())
 
   return hogCompNetStatsDF_DROP

@@ -57,6 +57,6 @@ def dropNaRows(hogCompDF_FULL, hogCompNaPath, compPairsNaPath):
   print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
   hogCompDF_DropNa.to_csv(hogCompNaPath, sep='\t', index=False)
   print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
-  hogCompDF_DropNa.drop(['HOG_GENE_A', 'HOG_GENE_B'], axis=1, inplace=True)
-  hogCompDF_DropNa.to_csv(compPairsNaPath, sep='\t', index=False)
+  removeHogIds = hogCompDF_DropNa.drop(['HOG_GENE_A', 'HOG_GENE_B'], axis=1)
+  removeHogIds.to_csv(compPairsNaPath, sep='\t', index=False)
   return hogCompDF_DropNa
