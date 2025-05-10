@@ -89,6 +89,8 @@ if argsDict['analysis'] == 'hits':
 
 elif argsDict['analysis'] == 'full':
   genePairsDF, genePairsDropNaPath = in_out.formatFullResults(argsDict, intermediateFilesPath, ercResultsFilePath)
+  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
+
 elif argsDict['analysis'] == 'both':
   print('Both')
 
