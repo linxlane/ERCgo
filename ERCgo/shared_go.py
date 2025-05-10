@@ -2,7 +2,7 @@ import pandas
 
 def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, jobName):
   ##For each gene pair, get GO terms for each gene and write all associations to tsv file
-  print('3. Collect GO terms for each gene in a pair and construct table')
+  print('2. Collect GO terms for each gene in a pair and construct table', flush=True)
 
   #Create new list to store each row of gene pairs and GO terms
   geneGOList = []
@@ -40,14 +40,16 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, jobName):
 
   ##Write table to file
   geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
-  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv')
+  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
+  print('   > DONE', flush=True)
   writePath = intermediateFilesPath + '/gene_pairs_w_GO_terms_TABLE_' + jobName + '.tsv'
   geneGoDF.to_csv(writePath, sep='\t', index=False)
+  print(' > DONE', flush=True)
   return geneGoDF, writePath
 
 
 def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName):
-  print('4. Analyze shared GO terms intersection for each pair and construct table')
+  print('3. Analyze shared GO terms intersection for each pair and construct table', flush=True)
 
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
   sharedStatsDF = baseDF.copy(deep=True)
@@ -154,6 +156,8 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Overlap_Score'] = overlapScoreList
   sharedStatsDF['label'] = edgeFileName
 
-  print('  > Write analysis table to tsv')
+  print('  > Write analysis table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + edgeFileName + '.tsv'
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
+  print('   > DONE', flush=True)
+  print(' > DONE', flush=True)

@@ -40,23 +40,23 @@ def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
 
   hogCompDF_FULL = pandas.DataFrame(geneLookupList, columns=['HOG_GENE_A', 'HOG_GENE_B', 'COMP_GENE_A', 'COMP_GENE_B'])
   
-  print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table to tsv')
+  print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B] table to tsv', flush=True)
   hogCompDF_FULL.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
   return hogCompDF_FULL
 
 def appendStats(hogCompDF, edgeFilePath, outputPath):
   edgeFileDF = pandas.read_csv(edgeFilePath, sep='\t', usecols=['P_R2', 'P_Pval', 'S_R2', 'S_Pval'])
   df = pandas.concat([hogCompDF, edgeFileDF], axis=1)
-  print('    > Write [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval] table to tsv')
+  print('    > Write [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval] table to tsv', flush=True)
   df.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
   return df
 
 def dropNaRows(hogCompDF_FULL, hogCompNaPath, compPairsNaPath):
   hogCompDF_DropNa = hogCompDF_FULL.dropna()
-  print('   > ' + str(len(hogCompDF_FULL) - len(hogCompDF_DropNa)) + ' gene pairs dropped due to no matching comprehensive id for one or both HOG id(s).')
-  print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
+  print('   > ' + str(len(hogCompDF_FULL) - len(hogCompDF_DropNa)) + ' gene pairs dropped due to no matching comprehensive id for one or both HOG id(s).', flush=True)
+  print('  > Write [HOG_GENE_A, HOG_GENE_B, COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv', flush=True)
   hogCompDF_DropNa.to_csv(hogCompNaPath, sep='\t', index=False)
-  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv')
+  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table without NONE values to tsv', flush=True)
   removeHogIds = hogCompDF_DropNa.drop(['HOG_GENE_A', 'HOG_GENE_B'], axis=1)
   removeHogIds.to_csv(compPairsNaPath, sep='\t', index=False)
   return hogCompDF_DropNa

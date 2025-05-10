@@ -15,7 +15,7 @@ def countGoTermsFrequency(uniqueIds, assoc_dict):
       goTerms.extend(assoc_dict[gene])
     else:
       keyErrorCounter += 1
-  print(f'   > Number of genes in edge file not found in GAF: {keyErrorCounter}')
+  print(f'   > Number of genes in edge file not found in GAF: {keyErrorCounter}', flush=True)
 
   #Create counter collection for GO term frequency
   populationCounts = Counter(goTerms)
@@ -29,16 +29,16 @@ def writePopulationFrequencies(populationWritePath, frequencyCounts):
 
 
 def calculatePopulationFrequencies(genePairs, geneGoDict, outputPath, jobName):
-  ##Summarize GO term population for all GO terms associated with genes in the current edge file
-  print('2. Gather GO term population of all genes in edge file')
+  ##Summarize GO term population for all GO terms associated with genes in the current file
+  print('1. Gather GO term population of all genes in file', flush=True)
   #Get unique genes from column A and B, returns set of gene comp ids
-  print('  > Get unique genes from column A and B')
+  print('  > Get unique genes from column A and B', flush=True)
   uniqueIds = populationUniqueGenes(genePairs)
 
   #Use counter container to get frequencies of each go term in the population
-  print('  > Create counter for GO term frequencies')
+  print('  > Create counter for GO term frequencies', flush=True)
   goTermFreq = countGoTermsFrequency(uniqueIds, geneGoDict)
-  print('  > Write frequency counter to file')
+  print('  > Write frequency counter to file', flush=True)
   populationWritePath = outputPath + '/Population_Frequencies_' + jobName + '.tsv'
   writePopulationFrequencies(populationWritePath, goTermFreq)
 
