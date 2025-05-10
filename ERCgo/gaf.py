@@ -1,5 +1,6 @@
 import pandas
 from goatools.anno.gaf_reader import GafReader
+import itertools
 
 def goatoolsReadGaf(gafPath):
   ogaf = GafReader(gafPath)
@@ -17,9 +18,26 @@ def goatoolsReadGaf(gafPath):
   return geneAndGoListDf
 
 
-def generateAssocDict(df):
-  assoc_dict = df.set_index('Gene_ID')['GO_Terms'].to_dict()
-  return assoc_dict
+def generateAssocDict(filePath):
+  goTermsDict = {}
+  with open(filePath, 'r') as goTerms:
+    next(goTerms)
+    for line in goTerms:
+      lineData = line.strip().split('\t')
+      key = lineData[0]
+      value = eval(lineData[1])
+
+      if key in goTermsDict:
+        currentVals = goTermsDict[key]
+        #print('currentVals:' + str(currentVals))
+        for item in value:
+          #print('Item:' + str(item))
+          currentVals.append(str(item))
+          #print('Update:' + str(currentVals))
+      else:
+        goTermsDict[key] = value
+  
+  return goTermsDict
 
 
 def processGaf(gafPath, masterOut):
@@ -28,17 +46,15 @@ def processGaf(gafPath, masterOut):
   goAssocDF = goatoolsReadGaf(gafPath)
   print(' > DONE')
 
-
   #Save go terms for each gene in tsv
   print('> Write [COMP_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv', flush=True)
   compGoPath = masterOut + '/[COMP_ID, GO_Terms]_TABLE.tsv'
   goAssocDF.to_csv(compGoPath, sep='\t', index=False)
   print(' > DONE')
 
-
   #Turn dataframe into dictionary and return for later gene-go look up
   print('> Generate dictionary of {Gene_ID:GO_Terms} to find GO terms associated with genes in ERCnet identified gene pairs', flush=True)
-  assoc_dict = generateAssocDict(goAssocDF)
+  assoc_dict = generateAssocDict(compGoPath)
   print(' > DONE')
 
   return assoc_dict
