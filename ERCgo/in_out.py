@@ -104,7 +104,6 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   genePairsDropNaPath = intermediateFilesPath + '/[COMP_GENE_A_FULL, COMP_GENE_B_FULL]_DROP_NA_' + argsDict['job_name'] + '.tsv'
   genePairsStatsDropNaPath = intermediateFilesPath + '/[COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA_' + argsDict['job_name'] + '.tsv'
 
-
   df = pandas.read_csv(ercFilePath, sep='\t', usecols=['GeneA_ID', 'GeneB_ID'])
   df = df.rename(columns={'GeneA_ID': 'COMP_GENE_A_FULL', 'GeneB_ID': 'COMP_GENE_B_FULL'})
   dropNaDF = df.dropna()
@@ -137,6 +136,6 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   mergeDF.drop('index', axis=1, inplace=True)
   mergeDF.drop('index_col', axis=1, inplace=True)
 
-  mergeDF.to_csv(genePairsStatsDropNaPath, sep='\t')
+  mergeDF.to_csv(genePairsStatsDropNaPath, sep='\t', index=False)
 
   return mergeDF, genePairsStatsDropNaPath
