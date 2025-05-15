@@ -46,8 +46,8 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
     print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
   
   if argsDict['analysis'] == 'full':
-    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'Slope', 'GO_Terms_A', 'GO_Terms_B'])
-    print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, Slope, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
+    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'Slope', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'GO_Terms_A', 'GO_Terms_B'])
+    print('  > Write [COMP_GENE_A, COMP_GENE_B, Slope, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
   writePath = intermediateFilesPath + '/gene_pairs_w_GO_terms_TABLE_' + argsDict['job_name'] + '.tsv'
   geneGoDF.to_csv(writePath, sep='\t', index=False)
   print(' > DONE', flush=True)
