@@ -6,6 +6,7 @@ def generateHogCompDict(path):
   hog_dict = df.set_index('HOG_ID')['Comprehensive_ID'].to_dict()
   return hog_dict
 
+
 def lookup(hogGene, hogCompDict):
   compGene = hogCompDict.get(hogGene)
   compGene = formatCompID(compGene)
@@ -16,9 +17,12 @@ def formatCompID(inputID):
   if inputID.startswith('HOG'):
     output = None
   else:
-    output = re.search(r'(?<=_)(AT)\w+', inputID).group() 
-
-  return output
+    try:
+      output = re.search(r'(?<=_)(AT)\w+', inputID).group() 
+      return output
+    except:
+      print('   > The following IDs do not match the ATXXXXX format and will be omitted.')
+      print('   > ' + inputID)
 
 
 def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
@@ -44,12 +48,14 @@ def generateHogCompTable(edgeFilePath, hogCompDict, outputPath):
   hogCompDF_FULL.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
   return hogCompDF_FULL
 
+
 def appendStats(hogCompDF, edgeFilePath, outputPath):
   edgeFileDF = pandas.read_csv(edgeFilePath, sep='\t', usecols=['P_R2', 'P_Pval', 'S_R2', 'S_Pval'])
   df = pandas.concat([hogCompDF, edgeFileDF], axis=1)
   print('    > Write [HOG_ID_A, HOG_ID_B, COMP_ID_A, COMP_ID_B, P_R2, P_Pval, S_R2, S_Pval] table to tsv', flush=True)
   df.to_csv(outputPath, sep='\t', index=False, na_rep='N/A')
   return df
+
 
 def dropNaRows(hogCompDF_FULL, hogCompNaPath, compPairsNaPath):
   hogCompDF_DropNa = hogCompDF_FULL.dropna()
