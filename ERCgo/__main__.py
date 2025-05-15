@@ -54,11 +54,12 @@ print('-------------------------------------------------------------------------
 #Check for existing directory at the output/job_name path, delete if it exists to start fresh
 print('> Check cli output argument and resolve if needed...')
 if argsDict['output'] is None:
-  outputDir = os.getcwd()
+  cwd = os.getcwd()
+  outputDir = cwd + '/OUTPUT'
 else:
   outputDir = argsDict['output']
 
-masterOutPath = in_out.checkOutputDirectory(outputDir + '/' + argsDict['job_name'])
+masterOutPath = in_out.checkOutputDirectory(outputDir + '/' + argsDict['job_name'] + '_OUT')
 
 #Make directory to write conversion files for later reference
 intermediateFilesPath = masterOutPath + '/Intermediate_Files_' + argsDict['job_name']
