@@ -143,14 +143,12 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
 
   print('4. Get statistic columns of interest from results file', flush=True)
   stats = pandas.read_csv(ercFilePath, sep='\t', usecols=['P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'Slope'])
-  print(stats.head())
   print(' > DONE', flush=True)
 
   print('5. Merge formatted id columns and statistic columns into one table', flush=True)
   mergeDF = formattedIds.merge(stats, left_on='index_col', right_index=True, how='inner').reset_index()
   mergeDF.drop('index', axis=1, inplace=True)
   mergeDF.drop('index_col', axis=1, inplace=True)
-  print(mergeDF.head())
   print(' > DONE', flush=True)
 
   print('6. Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, Slope]_DROP_NA table', flush=True)
