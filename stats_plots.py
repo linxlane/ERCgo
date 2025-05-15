@@ -107,10 +107,10 @@ def scatterPlot(ercData):
 def filterHits(ercData):
   hitsDf = ercData[ercData['P_Pval'] < 0.0001] 
   hitsDf = hitsDf[hitsDf['P_R2'] > 0.4]
-  hitsDf = hitsDf[hitsDf['slope'] > 0.0]
+  hitsDf = hitsDf[hitsDf['Slope'] > 0]
   nonHitsDf = ercData[ercData['P_Pval'] > 0.0001] 
   nonHitsDf = nonHitsDf[nonHitsDf['P_R2'] < 0.4]
-  hitsDf = hitsDf[hitsDf['slope'] < 0.0]
+  nonHitsDf = nonHitsDf[nonHitsDf['Slope'] < 0]
 
   return hitsDf, nonHitsDf
 
@@ -154,6 +154,7 @@ print('Read GO analysis file into a dataframe')
 print('---------------------------------------------------------------------------------------------------')
 try: 
   goAnalysisDf = pandas.read_csv(goAnalysisFilePath, sep='\t')
+  print(goAnalysisDf.head())
   print('Successful!')
 except:
   print('There was a problem reading the provided Go analysis file. Please check your input and try again.')
@@ -182,6 +183,8 @@ print(len(hits))
 print('Non-Hit Rows')
 print(len(nonHits))
 print('Hit Max')
+#hitMaxLoc = hits.loc[hits['Overlap_Score'] == 0.1361111111111111]
+#print(hitMaxLoc)
 print(hits['Overlap_Score'].max())
 print('Non-Hit Max')
 print(nonHits['Overlap_Score'].max())
