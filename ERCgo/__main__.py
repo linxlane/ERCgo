@@ -7,8 +7,8 @@ import population
 
 def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict):
   goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, masterOutPath, argsDict['job_name'])
-  genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsFilePath, geneGoDict, intermediateFilesPath, argsDict['job_name'])
-  shared_go.analyzeSharedGo(genePairsGoDF, masterOutPath, genePairsGoPath, goTermsFreq, argsDict['job_name'])
+  genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsFilePath, geneGoDict, intermediateFilesPath, argsDict)
+  shared_go.analyzeSharedGo(genePairsGoDF, masterOutPath, genePairsGoPath, goTermsFreq, argsDict)
 
 #######################
 # Start of ERCgo main #

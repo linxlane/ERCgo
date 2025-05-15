@@ -1,6 +1,6 @@
 import pandas
 
-def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, jobName):
+def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
   ##For each gene pair, get GO terms for each gene and write all associations to tsv file
   print('2. Collect GO terms for each gene in a pair and construct table', flush=True)
 
@@ -30,6 +30,8 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, jobName):
         matchingGoList.append(genePair[3])
         matchingGoList.append(genePair[4])
         matchingGoList.append(genePair[5])
+        if argsDict['analysis'] == 'full':
+          matchingGoList.append(genePair[6])
 
         #Append GO terms for each gene to row representation list
         matchingGoList.append(goTermsA)
@@ -39,10 +41,14 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, jobName):
         geneGOList.append(matchingGoList)
 
   ##Write table to file
-  geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
-  print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
-  print('   > DONE', flush=True)
-  writePath = intermediateFilesPath + '/gene_pairs_w_GO_terms_TABLE_' + jobName + '.tsv'
+  if argsDict['analysis'] == 'hits':
+    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
+    print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
+  
+  if argsDict['analysis'] == 'full':
+    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'Slope', 'GO_Terms_A', 'GO_Terms_B'])
+    print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, Slope, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
+  writePath = intermediateFilesPath + '/gene_pairs_w_GO_terms_TABLE_' + argsDict['job_name'] + '.tsv'
   geneGoDF.to_csv(writePath, sep='\t', index=False)
   print(' > DONE', flush=True)
   return geneGoDF, writePath
@@ -77,7 +83,7 @@ def colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGe
       
   return colorStr
 
-def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName):
+def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   print('3. Analyze shared GO terms intersection for each pair and construct table', flush=True)
 
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
@@ -177,8 +183,13 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
       color.append(colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes))
 
       #Get GO terms for gene A and gene B
-      goListA = eval(lineData[6])
-      goListB = eval(lineData[7])
+      if argsDict['analysis'] == 'hits':
+        goListA = eval(lineData[6])
+        goListB = eval(lineData[7])
+
+      if argsDict['analysis'] == 'full':
+        goListA = eval(lineData[7])
+        goListB = eval(lineData[8])
 
       #Convert GO term data to sets
       goSetA = set(goListA)
@@ -250,10 +261,10 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, edgeFileName
   sharedStatsDF['Formula'] = formulaList
   sharedStatsDF['Overlap_Score'] = overlapScoreList
   sharedStatsDF['Color'] = color
-  sharedStatsDF['label'] = edgeFileName
+  sharedStatsDF['label'] = argsDict['job_name']
 
   print('  > Write analysis table to tsv', flush=True)
-  analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + edgeFileName + '.tsv'
+  analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + argsDict['job_name'] + '.tsv'
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
   print('   > DONE', flush=True)
   print(' > DONE', flush=True)

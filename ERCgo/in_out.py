@@ -142,7 +142,7 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   print(' > DONE', flush=True)
 
   print('4. Get statistic columns of interest from results file', flush=True)
-  stats = pandas.read_csv(ercFilePath, sep='\t', usecols=['P_R2', 'P_Pval', 'S_R2', 'S_Pval'])
+  stats = pandas.read_csv(ercFilePath, sep='\t', usecols=['P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'Slope'])
   print(' > DONE', flush=True)
 
   print('5. Merge formatted id columns and statistic columns into one table', flush=True)
@@ -151,7 +151,7 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   mergeDF.drop('index_col', axis=1, inplace=True)
   print(' > DONE', flush=True)
 
-  print('6. Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval]_DROP_NA table', flush=True)
+  print('6. Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, Slope]_DROP_NA table', flush=True)
   mergeDF.to_csv(genePairsStatsDropNaPath, sep='\t', index=False)
   print(' > DONE', flush=True)
 
