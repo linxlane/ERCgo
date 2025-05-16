@@ -53,31 +53,16 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
   print(' > DONE', flush=True)
   return geneGoDF, writePath
 
-def colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes):
+def colorCode(geneA, geneB, interestGenes, clpGenes):
   colorStr = ''
-  if geneA in allInterestGenes or geneB in allInterestGenes:
-    if geneA in alphaList:
-      colorStr += 'Alpha-'
-    elif geneA in betaList:
-      colorStr += 'Beta-'
-    elif geneA in rpnList:
-      colorStr += 'RPN-'
-    elif geneA in rptList:
-      colorStr += 'RPT-'
-    else:
-      colorStr += 'Other-'
-    
-    if geneB in alphaList:
-      colorStr += 'Alpha'
-    elif geneB in betaList:
-      colorStr += 'Beta'
-    elif geneB in rpnList:
-      colorStr += 'RPN'
-    elif geneB in rptList:
-      colorStr += 'RPT'
-    else:
-      colorStr += 'Other'
-
+  if geneA in clpGenes and geneB in clpGenes:
+    colorStr = 'Clp-Clp interaction'
+  elif geneA in clpGenes and geneB in interestGenes:
+    colorStr = 'Clp-Interest interaction'
+  elif geneA in interestGenes and geneB in clpGenes:
+    colorStr = 'Interest-Clp interaction'
+  elif geneA in interestGenes and geneB in interestGenes:
+    colorStr = 'Interest-Interest interaction'
   else:
     colorStr = 'Not of interest'
       
@@ -90,64 +75,12 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   sharedStatsDF = baseDF.copy(deep=True)
 
   #color code genes
-  alphaList = ['AT2G05840',
-                'AT5G35590',
-                'AT1G16470',
-                'AT1G79210',
-                'AT3G22110',
-                'AT4G15165',
-                'AT3G51260',
-                'AT5G66140',
-                'AT1G53850',
-                'AT3G14290',
-                'AT1G47250',
-                'AT5G42790',
-                'AT2G27020']
-
-  betaList = ['AT4G31300',
-              'AT3G27430',
-              'AT5G40580',
-              'AT1G21720',
-              'AT1G77440',
-              'AT3G22630',
-              'AT4G14800',
-              'AT1G13060',
-              'AT3G26340',
-              'AT3G60820',
-              'AT1G56450']
-
-  rpnList = ['AT4G38630',
-              'AT5G23540',
-              'AT1G64520',
-              'AT5G42040',
-              'AT2G20580',
-              'AT4G28470',
-              'AT1G04810',
-              'AT2G32730',
-              'AT1G20200',
-              'AT1G75990',
-              'AT5G09900',
-              'AT5G64760',
-              'AT1G29150',
-              'AT4G24820',
-              'AT3G11270',
-              'AT5G05780',
-              'AT4G19006',
-              'AT5G45620']
-
-  rptList = ['AT1G53750',
-              'AT1G53780',
-              'AT2G20140',
-              'AT4G29040',
-              'AT5G58290',
-              'AT1G45000',
-              'AT5G43010',
-              'AT1G09100',
-              'AT3G05530',
-              'AT5G19990',
-              'AT5G20000']
+   #Clp genes and other genes of interest for plot coloring
+  interestGenes = ['AT1G06950', 'AT5G53080', 'AT2G04270', 'AT1G26460', 'AT3G12380', 
+                'AT3G60830', 'AT1G10510', 'AT3G19800', 'AT1G36320']
   
-  allInterestGenes = alphaList + betaList + rpnList + rptList
+  clpGenes = ['ATCG00670', 'AT1G49970', 'AT1G12410', 'AT1G09130', 
+                   'AT4G17040', 'AT1G66670', 'AT4G12060']
 
   ##Initialize new rows and variables to conduct calculations/analysis
   lengthGoAList = []
@@ -180,7 +113,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
       geneA = lineData[0]
       geneB = lineData[1]
 
-      color.append(colorCode(geneA, geneB, alphaList, betaList, rpnList, rptList, allInterestGenes))
+      color.append(colorCode(geneA, geneB, interestGenes, clpGenes))
 
       #Get GO terms for gene A and gene B
       if argsDict['analysis'] == 'hits':
