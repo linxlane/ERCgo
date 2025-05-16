@@ -7,13 +7,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import mannwhitneyu, rankdata, pearsonr, spearmanr, linregress
-import datashader as ds
-import datashader.transfer_functions as tf
-import colormaps as cmaps
-import holoviews as hv
-from holoviews.operation.datashader import datashade
-import colorcet as cc
-
 
 def checkOutputDirectory(outPath):
     if not os.path.exists(outPath):
@@ -63,18 +56,17 @@ def scatterPlot(ercData):
 
     # replaceZerosDF['negLog10'] = negLog10(replaceZerosDF['P_Pval'])
 
-    alphaAlphaMask = replaceZerosDF["Color"] == "Alpha-Alpha"
-    betaBetaMask = replaceZerosDF["Color"] == "Beta-Beta"
-    rpnRpnMask = replaceZerosDF["Color"] == "RPN-RPN"
-    rptRptMask = replaceZerosDF["Color"] == "RPT-RPT"
-    otherMask = replaceZerosDF["Color"].str.contains("Other")
+    clpClpMask = replaceZerosDF["Color"] == "Clp-Clp interaction"
+    clpInterestMask = replaceZerosDF["Color"] == "Clp-Interest interaction"
+    interestClpMask = replaceZerosDF["Color"] == "Interest-Clp interaction"
+    interestInterestMask = replaceZerosDF["Color"] == "Interest-Interest"
     noInterestMask = replaceZerosDF["Color"] == "Not of interest"
 
-    alphaAlphaDF = replaceZerosDF[alphaAlphaMask].reset_index()
-    betaBetaDF = replaceZerosDF[betaBetaMask].reset_index()
-    rpnRpnDF = replaceZerosDF[rpnRpnMask].reset_index()
-    rptRptDF = replaceZerosDF[rptRptMask].reset_index()
-    otherDF = replaceZerosDF[otherMask].reset_index()
+    clpClpDF = replaceZerosDF[clpClpMask].reset_index()
+    clpInterestDF = replaceZerosDF[clpInterestMask].reset_index()
+    interestClpDF = replaceZerosDF[interestClpMask].reset_index()
+    interestInterestDF = replaceZerosDF[interestInterestMask].reset_index()
+    
 
     allPoints = sns.scatterplot(
         data=replaceZerosDF[noInterestMask],
@@ -85,7 +77,7 @@ def scatterPlot(ercData):
         zorder=1,
     )
     rprRprPlot = sns.scatterplot(
-        data=replaceZerosDF[rptRptMask],
+        data=replaceZerosDF[interestInterestMask],
         x="Overlap_Score",
         y="P_R2",
         marker="o",
@@ -93,31 +85,23 @@ def scatterPlot(ercData):
         zorder=2,
     )
     rpnRpnPlot = sns.scatterplot(
-        data=replaceZerosDF[rpnRpnMask],
-        x="Overlap_Score",
-        y="P_R2",
-        marker="o",
-        color="purple",
-        zorder=2,
-    )
-    betaBetaPlot = sns.scatterplot(
-        data=replaceZerosDF[betaBetaMask],
-        x="Overlap_Score",
-        y="P_R2",
-        marker="o",
-        color="orange",
-        zorder=2,
-    )
-    alphaAlphaPlot = sns.scatterplot(
-        data=replaceZerosDF[alphaAlphaMask],
+        data=replaceZerosDF[interestClpMask],
         x="Overlap_Score",
         y="P_R2",
         marker="o",
         color="blue",
         zorder=2,
     )
-    otherPlot = sns.scatterplot(
-        data=replaceZerosDF[otherMask],
+    betaBetaPlot = sns.scatterplot(
+        data=replaceZerosDF[clpInterestMask],
+        x="Overlap_Score",
+        y="P_R2",
+        marker="o",
+        color="blue",
+        zorder=2,
+    )
+    alphaAlphaPlot = sns.scatterplot(
+        data=replaceZerosDF[clpClpMask],
         x="Overlap_Score",
         y="P_R2",
         marker="o",
@@ -149,11 +133,9 @@ def scatterPlot(ercData):
   """
 
     plt.xscale("log")
-
+    plt.xlabel('log(Overlap_Score)')
     plt.ylabel("P_R2")
-
-    plt.title("Proteosome BXB Hits")
-
+    plt.title("Clp R2T Hits")
     plt.show()
 
 
@@ -173,11 +155,15 @@ def filterHits(ercData):
 def plotPropKde(nonHitsProps, hitsProp):
     sns.kdeplot(nonHitsProps)
     plt.axvline(x=hitsProp, color='red', linestyle='--')
+    plt.title('Proportion KDE')
+    plt.xlabel('len(nonHitsSample > 0)/len(nonHitsSample)')
     plt.show()
 
 def plotMeanKde(nonHitsMeans, hitsMean):
     sns.kdeplot(nonHitsMeans)
     plt.axvline(x=hitsMean, color='red', linestyle='--')
+    plt.title('Mean KDE')
+    plt.xlabel('1000 means of non-hit samples')
     plt.show()
 
 def mannwhitney(hits, nonhits):
@@ -272,8 +258,8 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-# scatterPlot(goAnalysisDf)
-print("Skip")
+scatterPlot(goAnalysisDf)
+#print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
@@ -287,6 +273,7 @@ print("Permutation Test and KDE")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
+'''
 hits, nonHits = filterHits(goAnalysisDf)
 # print(type(hits))
 # print(type(nonHits))
@@ -316,7 +303,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-
+'''
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
