@@ -16,6 +16,8 @@ def lookup(hogGene, hogCompDict):
 def formatCompID(inputID):
   if inputID.startswith('HOG'):
     output = None
+  elif inputID == 'CLPP1':
+    output = 'ATCG00670'
   else:
     try:
       output = re.search(r'(?<=_)(AT)\w+', inputID).group() 
