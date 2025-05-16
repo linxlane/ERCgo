@@ -153,6 +153,7 @@ def filterHits(ercData):
 
 
 def plotPropKde(nonHitsProps, hitsProp):
+    plt.figure()
     sns.kdeplot(nonHitsProps)
     plt.axvline(x=hitsProp, color='red', linestyle='--')
     plt.title('Proportion KDE')
@@ -160,6 +161,7 @@ def plotPropKde(nonHitsProps, hitsProp):
     plt.savefig('permutation_prop_KDE.pdf', format='pdf')
 
 def plotMeanKde(nonHitsMeans, hitsMean):
+    plt.figure()
     sns.kdeplot(nonHitsMeans)
     plt.axvline(x=hitsMean, color='red', linestyle='--')
     plt.title('Mean KDE')
