@@ -157,14 +157,14 @@ def plotPropKde(nonHitsProps, hitsProp):
     plt.axvline(x=hitsProp, color='red', linestyle='--')
     plt.title('Proportion KDE')
     plt.xlabel('len(nonHitsSample > 0)/len(nonHitsSample)')
-    plt.show()
+    plt.savefig('permutation_prop_KDE.pdf', format='pdf')
 
 def plotMeanKde(nonHitsMeans, hitsMean):
     sns.kdeplot(nonHitsMeans)
     plt.axvline(x=hitsMean, color='red', linestyle='--')
     plt.title('Mean KDE')
     plt.xlabel('1000 means of non-hit samples')
-    plt.show()
+    plt.savefig('permutation_mean_KDE.pdf', format='pdf')
 
 def mannwhitney(hits, nonhits):
     # Perform the one-sided Mann-Whitney U test (sample1 > sample2)
@@ -258,8 +258,8 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-scatterPlot(goAnalysisDf)
-#print("Skip")
+#scatterPlot(goAnalysisDf)
+print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
@@ -273,7 +273,7 @@ print("Permutation Test and KDE")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-'''
+
 hits, nonHits = filterHits(goAnalysisDf)
 # print(type(hits))
 # print(type(nonHits))
@@ -303,7 +303,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-'''
+
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
