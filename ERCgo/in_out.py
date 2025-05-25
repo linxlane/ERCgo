@@ -57,6 +57,18 @@ def findGafFile(directory):
   else:
     sys.exit('  > Too many GAF files found. Terminating ERCgo.')
 
+def findInteractomeFile(directory):
+  search_result = glob.glob(directory + '/*interactome*')
+  if len(search_result) == 0:
+    sys.exit('  > Interactome file not found. Terminating ERCgo.')
+
+  elif len(search_result) == 1:
+    print(' > Interactome file found.')
+    return search_result[0]
+
+  else:
+    sys.exit('  > Too many Interactome files found. Terminating ERCgo.')
+
 
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
@@ -156,3 +168,27 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   print(' > DONE', flush=True)
 
   return mergeDF, genePairsStatsDropNaPath
+
+
+def formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath):
+  print('1. Read interactome data into a dataframe', flush=True)
+  interactomeDf = pandas.read_csv(interactomeFilePath, sep='\t')
+
+  print('2. Drop rows where gene id(s) do not match ATXXXXXXX format', flush=True)
+  keepersPath = intermediateFilesPath + '/.tsv'
+  dropPath = intermediateFilesPath + '/drop_id_rows.tsv'
+
+  #ATccddddd format regex
+  regex = r'AT[\dA-Z][\dA-Z][\d]{5}'
+
+  print(' > Find rows with standard ID')
+  keepersFilter = (interactomeDf['TAIR8A'].str.contains(regex)) & (interactomeDf['TAIR8B'].str.contains(regex))
+  keepers = interactomeDf[keepersFilter]
+  print(' > Write rows with standard ID to tsv')
+  keepers.to_csv(keepersPath, sep='\t', index=False)
+
+  drop = interactomeDf[~keepersFilter]
+  drop.to_csv(dropPath, sep='\t', index=False)
+  print(' > ' + str(len(drop)) + ' rows dropped due to non-standarad ids. See tsv in intermediate files for details.')
+
+  return keepers, keepersPath
