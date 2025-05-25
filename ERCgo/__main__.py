@@ -24,7 +24,7 @@ args = cli.runParser()
 argsDict = vars(args)
 
 print('=======================================================================================================')
-print('Conducting preliminary steps for ERCgo analysis: collecting, generating, and formatting files and data')
+print('Conducting preliminary steps for ERCgo analysis: collecting files and checking output directory')
 print('=======================================================================================================')
 print('---------------------------------------------------------------------------------------------------')
 print('INPUT')
@@ -33,17 +33,7 @@ print('-------------------------------------------------------------------------
 ##Check input
 print('> Verify correct input files are present for specified analysis...')
 gafFilePath = in_out.findGafFile(argsDict['input'])
-if argsDict['analysis'] == 'hits':
-  edgeFilePath = in_out.findEdgeFile(argsDict['input'])
-  verticesFilePath = in_out.findVerticesFile(argsDict['input'])
-
-elif argsDict['analysis'] == 'full':
-  ercResultsFilePath = in_out.findErcResultsFile(argsDict['input'])
-
-elif argsDict['analysis'] == 'both':
-  edgeFilePath = in_out.findEdgeFile(argsDict['input'])
-  verticesFilePath = in_out.findVerticesFile(argsDict['input'])
-  ercResultsFilePath = in_out.findErcResultsFile(argsDict['input'])
+interactomeFilePath = in_out.findInteractomeFile(argsDict['input'])
 print('> DONE')
 
 print('---------------------------------------------------------------------------------------------------')
@@ -80,21 +70,13 @@ geneGoDict = gaf.processGaf(gafFilePath, masterOutPath)
 print('> DONE')
 
 ########################################
-# Format input data #
+# Preprocess input data #
 ########################################
 print('=======================================================================================================')
-print('Format input data into [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval] table for analysis')
+print('Preprocess input data for analysis')
 print('=======================================================================================================')
 
-if argsDict['analysis'] == 'hits':
-  genePairsDF, genePairsDropNaPath = in_out.formatErcNetDataHits(argsDict, intermediateFilesPath, edgeFilePath, verticesFilePath)
-
-elif argsDict['analysis'] == 'full':
-  genePairsDF, genePairsDropNaPath = in_out.formatFullResults(argsDict, intermediateFilesPath, ercResultsFilePath)
-
-elif argsDict['analysis'] == 'both':
-  hitGenePairsDF, hitGenePairsDropNaPath = in_out.formatErcNetDataHits(argsDict, intermediateFilesPath, edgeFilePath, verticesFilePath)
-  fullGenePairsDF, fullGenePairsDropNaPath = in_out.formatFullResults(argsDict, intermediateFilesPath, ercResultsFilePath)
+genePairsDF, genePairsPath = in_out.formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath)
 
 ########################################
 # Analysis #
@@ -103,15 +85,7 @@ print('=========================================================================
 print('GO term analysis')
 print('=======================================================================================================')
 
-if argsDict['analysis'] == 'hits':
-  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
-
-elif argsDict['analysis'] == 'full':
-  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
-
-elif argsDict['analysis'] == 'both':
-  analysisPipeline(hitGenePairsDF, hitGenePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
-  analysisPipeline(fullGenePairsDF, fullGenePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
+analysisPipeline(genePairsDF, genePairsPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
 
 print('#####################')
 print('Go analysis complete! ')
