@@ -260,14 +260,14 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-#scatterPlot(goAnalysisDf)
-print("Skip")
+scatterPlot(goAnalysisDf)
+#print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
 # print('---------------------------------------------------------------------------------------------------')
 # plotFullData(goAnalysisDf)
-
+'''
 print(
     "---------------------------------------------------------------------------------------------------"
 )
@@ -305,7 +305,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-
+'''
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
