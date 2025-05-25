@@ -2,7 +2,7 @@ import pandas
 from collections import Counter
 
 def populationUniqueGenes(genePairsDf):
-  uniqueGenes = set(list(genePairsDf['COMP_GENE_A']) + list(genePairsDf['COMP_GENE_B']))
+  uniqueGenes = set(list(genePairsDf['TAIR8A']) + list(genePairsDf['TAIR8B']))
   return uniqueGenes
 
 
