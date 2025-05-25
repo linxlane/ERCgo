@@ -25,13 +25,12 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
       if goTermsA != None and goTermsB != None:
         matchingGoList.append(genePair[0])
         matchingGoList.append(genePair[1])
-        #Append R2 values and p values
+        #Append descriptions, species, experiment types, and CV data
         matchingGoList.append(genePair[2])
         matchingGoList.append(genePair[3])
         matchingGoList.append(genePair[4])
         matchingGoList.append(genePair[5])
-        if argsDict['analysis'] == 'full':
-          matchingGoList.append(genePair[6])
+        matchingGoList.append(genePair[6])
 
         #Append GO terms for each gene to row representation list
         matchingGoList.append(goTermsA)
@@ -41,13 +40,8 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
         geneGOList.append(matchingGoList)
 
   ##Write table to file
-  if argsDict['analysis'] == 'hits':
-    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval','GO_Terms_A', 'GO_Terms_B'])
-    print('  > Write [COMP_GENE_A, COMP_GENE_B, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
-  
-  if argsDict['analysis'] == 'full':
-    geneGoDF = pandas.DataFrame(geneGOList, columns=['COMP_GENE_A', 'COMP_GENE_B', 'Slope', 'P_R2', 'P_Pval', 'S_R2', 'S_Pval', 'GO_Terms_A', 'GO_Terms_B'])
-    print('  > Write [COMP_GENE_A, COMP_GENE_B, Slope, P_R2, P_Pval, S_R2, S_Pval, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
+  geneGoDF = pandas.DataFrame(geneGOList, columns=['TAIR8A', 'TAIR8B', 'Description_A', 'Description_B', 'Species', 'Experiment_Types', 'Confidence_Value', 'GO_Terms_A', 'GO_Terms_B'])
+  print('  > Write [TAIR8A, TAIR8B, Description_A, Description_B, Species, Experiment_Types, Confidence_Value, GO_TERMS_A, GO_TERMS_B] table to tsv', flush=True)
   writePath = intermediateFilesPath + '/gene_pairs_w_GO_terms_TABLE_' + argsDict['job_name'] + '.tsv'
   geneGoDF.to_csv(writePath, sep='\t', index=False)
   print(' > DONE', flush=True)
