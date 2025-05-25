@@ -14,7 +14,7 @@ def goatoolsReadGaf(gafPath):
       geneGoPair.append(sorted(go_ids))
       geneAndGoList.append(geneGoPair)
 
-  geneAndGoListDf = pandas.DataFrame(geneAndGoList, columns=['Gene_ID', 'GO_Terms'])
+  geneAndGoListDf = pandas.DataFrame(geneAndGoList, columns=['TAIR8_ID', 'GO_Terms'])
   return geneAndGoListDf
 
 
@@ -47,8 +47,8 @@ def processGaf(gafPath, masterOut):
   print(' > DONE')
 
   #Save go terms for each gene in tsv
-  print('> Write [COMP_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv', flush=True)
-  compGoPath = masterOut + '/[COMP_ID, GO_Terms]_TABLE.tsv'
+  print('> Write [TAIR8_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv', flush=True)
+  compGoPath = masterOut + '/[TAIR8_ID, GO_Terms]_TABLE.tsv'
   goAssocDF.to_csv(compGoPath, sep='\t', index=False)
   print(' > DONE')
 
