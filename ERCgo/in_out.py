@@ -4,7 +4,6 @@ import os
 import shutil
 import hog_comp_ids
 import pandas
-import re
 
 def findEdgeFile(directory):
   search_result = glob.glob(directory + '/*edges*')
@@ -175,7 +174,7 @@ def formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath):
   interactomeDf = pandas.read_csv(interactomeFilePath, sep='\t')
 
   print('2. Drop rows where gene id(s) do not match ATXXXXXXX format', flush=True)
-  keepersPath = intermediateFilesPath + '/.tsv'
+  keepersPath = intermediateFilesPath + '/gene_pairs_for_analysis.tsv'
   dropPath = intermediateFilesPath + '/drop_id_rows.tsv'
 
   #ATccddddd format regex
