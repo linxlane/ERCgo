@@ -6,7 +6,7 @@ import os
 import population
 
 def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict):
-  goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, masterOutPath, argsDict['job_name'])
+  goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, intermediateFilesPath, argsDict['job_name'])
   genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsFilePath, geneGoDict, intermediateFilesPath, argsDict)
   shared_go.analyzeSharedGo(genePairsGoDF, masterOutPath, genePairsGoPath, goTermsFreq, argsDict)
 
@@ -66,7 +66,7 @@ print('-------------------------------------------------------------------------
 
 ##Create dictionary of genes and associated GO terms by reading and processing GAF
 #GAF file
-geneGoDict = gaf.processGaf(gafFilePath, masterOutPath)
+geneGoDict = gaf.processGaf(gafFilePath, intermediateFilesPath)
 print('> DONE')
 
 ########################################
@@ -88,6 +88,6 @@ print('=========================================================================
 analysisPipeline(genePairsDF, genePairsPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
 
 print('#####################')
-print('Go analysis complete! ')
+print('Go analysis complete!')
 print('#####################')
 print('\n')
