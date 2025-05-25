@@ -40,7 +40,7 @@ def generateAssocDict(filePath):
   return goTermsDict
 
 
-def processGaf(gafPath, masterOut):
+def processGaf(gafPath, outPath):
   #Get GO terms for each gene in gene association file, returns dataframe
   print('> Utilize GOATOOLS package to extract GO terms for each gene from GAF', flush=True)
   goAssocDF = goatoolsReadGaf(gafPath)
@@ -48,7 +48,7 @@ def processGaf(gafPath, masterOut):
 
   #Save go terms for each gene in tsv
   print('> Write [TAIR8_ID, GO_Terms] table to tsv: ID_GO_TERMS_TABLE.tsv', flush=True)
-  compGoPath = masterOut + '/[TAIR8_ID, GO_Terms]_TABLE.tsv'
+  compGoPath = outPath + '/[TAIR8_ID, GO_Terms]_TABLE.tsv'
   goAssocDF.to_csv(compGoPath, sep='\t', index=False)
   print(' > DONE')
 
