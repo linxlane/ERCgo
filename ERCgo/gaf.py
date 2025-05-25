@@ -1,6 +1,5 @@
 import pandas
 from goatools.anno.gaf_reader import GafReader
-import itertools
 
 def goatoolsReadGaf(gafPath):
   ogaf = GafReader(gafPath)
