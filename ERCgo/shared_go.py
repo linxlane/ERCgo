@@ -110,13 +110,8 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
       color.append(colorCode(geneA, geneB, interestGenes, clpGenes))
 
       #Get GO terms for gene A and gene B
-      if argsDict['analysis'] == 'hits':
-        goListA = eval(lineData[6])
-        goListB = eval(lineData[7])
-
-      if argsDict['analysis'] == 'full':
-        goListA = eval(lineData[7])
-        goListB = eval(lineData[8])
+      goListA = eval(lineData[7])
+      goListB = eval(lineData[8])
 
       #Convert GO term data to sets
       goSetA = set(goListA)
