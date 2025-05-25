@@ -172,6 +172,7 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
 def formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath):
   print('1. Read interactome data into a dataframe', flush=True)
   interactomeDf = pandas.read_csv(interactomeFilePath, sep='\t')
+  interactomeDf = interactomeDf.rename(columns={'Description A': 'Description_A', 'Description B': 'Description_B', 'Experiment types': 'Experiment_Types', 'CV': 'Confidence_Value'})
 
   print('2. Drop rows where gene id(s) do not match ATXXXXXXX format', flush=True)
   keepersPath = intermediateFilesPath + '/gene_pairs_for_analysis.tsv'
