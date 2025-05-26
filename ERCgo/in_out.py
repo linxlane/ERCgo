@@ -176,8 +176,7 @@ def formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath):
 
   print('2. Drop rows where gene id(s) do not match ATXXXXXXX format', flush=True)
   forAnalysisPath = intermediateFilesPath + '/gene_pairs_for_analysis.tsv'
-  nonstandardPath = intermediateFilesPath + '/drop_id_rows.tsv'
-  identicalPath = intermediateFilesPath + '/identical_id_rows.tsv'
+  droppedPath = intermediateFilesPath + '/dropped_rows.tsv'
 
   #ATccddddd format regex
   regex = r'AT[\dA-Z][\dA-Z][\d]{5}'
@@ -186,15 +185,17 @@ def formatInteractomeData(argsDict, intermediateFilesPath, interactomeFilePath):
   standardFilter = (interactomeDf['TAIR8A'].str.contains(regex)) & (interactomeDf['TAIR8B'].str.contains(regex))
   standardIdDF = interactomeDf[standardFilter]
 
-  drop = interactomeDf[~standardFilter]
-  drop.to_csv(nonstandardPath, sep='\t', index=False)
+  drop = interactomeDf[~standardFilter].copy()
+  drop['Drop_Reason'] = 'Non-standard ID'
+  drop.to_csv(droppedPath, sep='\t', index=False)
   print(' > ' + str(len(drop)) + ' rows dropped due to non-standarad ids. See tsv in intermediate files for details.')
 
   print('3. Drop rows where gene id(s) match in both columns', flush=True)
   identicalFilter = (standardIdDF['TAIR8A']) == (standardIdDF['TAIR8B'])
-  identicalDf = standardIdDF[identicalFilter]
+  identicalDf = standardIdDF[identicalFilter].copy()
+  identicalDf['Drop_Reason'] = 'Identical Gene A and B'
   print(' > ' + str(len(identicalDf)) + ' rows where gene A and gene B are the same. See tsv in intermediate files for details.')
-  identicalDf.to_csv(identicalPath, sep='\t', index=False)
+  identicalDf.to_csv(droppedPath, mode='a', header=False, sep='\t', index=False)
   #print(identicalDf.head(20))
 
   print('4. Write table where ids are standard and genes in pairs are unique', flush=True)
