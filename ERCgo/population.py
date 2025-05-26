@@ -15,7 +15,7 @@ def countGoTermsFrequency(uniqueIds, assoc_dict):
       goTerms.extend(assoc_dict[gene])
     else:
       keyErrorCounter += 1
-  print(f'   > Number of genes in edge file not found in GAF: {keyErrorCounter}', flush=True)
+  print(f'   > Number of genes not found in GAF: {keyErrorCounter}', flush=True)
 
   #Create counter collection for GO term frequency
   populationCounts = Counter(goTerms)
