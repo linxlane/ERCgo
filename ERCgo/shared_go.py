@@ -87,7 +87,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   frequenciesB_List = []
   weightedIntersectionList = []
   weightedIntersection = 0.0
-  totalSetLengthsList = []
+  numUniqueTermsABList = []
   overlapScore = 0.0
   overlapScoreList = []
   formula = ''
@@ -149,9 +149,9 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
 
       ##Calculate 
       totalSetLengths = len(goSetA) + len(goSetB)
-      totalSetLengthsList.append(totalSetLengths)
 
       uniqueGoTermsLenth = len(goSetA.union(goSetB))
+      numUniqueTermsABList.append(uniqueGoTermsLenth)
 
       if uniqueGoTermsLenth == 0:
         overlapScore = 0.0
@@ -171,22 +171,45 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
       overlapScoreList.append(overlapScore)
       overlapScore = 0.0
 
-  sharedStatsDF['Length_Go_A'] = lengthGoAList
-  sharedStatsDF['Length_Go_B'] = lengthGoBList
+  sharedStatsDF['Length_GO_A'] = lengthGoAList
+  sharedStatsDF['Length_GO_B'] = lengthGoBList
   sharedStatsDF['Shared_GO'] = goTermIntersectionList
   sharedStatsDF['Number_of_Shared_GO'] = sharedGoLen  
   sharedStatsDF['Population_Frequencies_A'] = frequenciesA_List
   sharedStatsDF['Population_Frequencies_B'] = frequenciesB_List
   sharedStatsDF['Intersection_Frequencies'] = intersectionFrequenciesList
   sharedStatsDF['Weighted_Intersection'] = weightedIntersectionList
-  sharedStatsDF['Length_SetA_and_SetB'] = totalSetLengthsList
+  sharedStatsDF['Number_of_Unique_Terms_AB'] = numUniqueTermsABList
   sharedStatsDF['Formula'] = formulaList
   sharedStatsDF['Overlap_Score'] = overlapScoreList
   sharedStatsDF['Color'] = color
-  sharedStatsDF['label'] = argsDict['job_name']
+  sharedStatsDF['Label'] = argsDict['job_name']
+
+  sharedStatsDFOrder = sharedStatsDF[['TAIR8A', 
+                                      'TAIR8B', 
+                                      'Description_A', 
+                                      'Description_B', 
+                                      'Species', 
+                                      'Experiment_Types', 
+                                      'Confidence_Value', 
+                                      'GO_Terms_A',
+                                      'Length_GO_A',
+                                      'Population_Frequencies_A',
+                                      'GO_Terms_B',
+                                      'Length_GO_B',
+                                      'Population_Frequencies_B',
+                                      'Shared_GO',
+                                      'Number_of_Shared_GO',
+                                      'Intersection_Frequencies',
+                                      'Weighted_Intersection',
+                                      'Number_of_Unique_Terms_AB',
+                                      'Formula',
+                                      'Overlap_Score',
+                                      'Color',
+                                      'Label']]
 
   print('  > Write analysis table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/GO_ANALYSIS_' + argsDict['job_name'] + '.tsv'
-  sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
+  sharedStatsDFOrder.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
   print('   > DONE', flush=True)
   print(' > DONE', flush=True)
