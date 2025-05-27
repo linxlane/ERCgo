@@ -1,8 +1,7 @@
-name: ercgo
+name: ercgo_new
 channels:
   - defaults
 dependencies:
   - pandas
   - conda-forge::goatools
   - seaborn
-prefix: /Users/linlane/anaconda3/envs/ercgo
