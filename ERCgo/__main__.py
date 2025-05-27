@@ -29,11 +29,16 @@ print('=========================================================================
 print('---------------------------------------------------------------------------------------------------')
 print('INPUT')
 print('---------------------------------------------------------------------------------------------------')
-
+'''
 ##Check input
 print('> Verify correct input files are present for specified analysis...')
 gafFilePath = in_out.findGafFile(argsDict['input'])
 interactomeFilePath = in_out.findInteractomeFile(argsDict['input'])
+print('> DONE')
+'''
+print('> Verify correct input files are present for specified analysis...')
+gafFilePath = in_out.verifyGafFile(argsDict['gaf'])
+interactomeFilePath = in_out.verifyInteractomeFile(argsDict['interactome'])
 print('> DONE')
 
 print('---------------------------------------------------------------------------------------------------')

@@ -68,6 +68,19 @@ def findInteractomeFile(directory):
   else:
     sys.exit('  > Too many Interactome files found. Terminating ERCgo.')
 
+def verifyGafFile(path):
+  if os.path.exists(path):
+    print(' > GAF file found.')
+    return path
+  else:
+    sys.exit('  > GAF file not found. Terminating ERCgo.')
+
+def verifyInteractomeFile(path):
+  if os.path.exists(path):
+    print(' > Network file found.')
+    return path
+  else:
+    sys.exit('  > Network file not found. Terminating ERCgo.')
 
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
