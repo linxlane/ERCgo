@@ -1,4 +1,4 @@
-name: ercgo_new
+name: ercgo
 channels:
   - defaults
 dependencies:
