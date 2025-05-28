@@ -7,7 +7,7 @@ or
 python3 ERCgo -d my_input_files
 ```
 
-Please note that either the -i and -g flags or the -d flag must be included in the command for ERCgo to properly run.
+Please note that either the -i and -g flags or the -d flag must be included in the command for ERCgo to properly run. Do not use all three.
 
 | Short flag | Long flag         | Description | Required? |
 |------------|-------------------|-------------|-----------|
