@@ -4,6 +4,7 @@ import gaf
 import shared_go
 import os
 import population
+import sys
 
 def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict):
   goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, intermediateFilesPath, argsDict['job_name'])
@@ -29,17 +30,22 @@ print('=========================================================================
 print('---------------------------------------------------------------------------------------------------')
 print('INPUT')
 print('---------------------------------------------------------------------------------------------------')
-'''
-##Check input
 print('> Verify correct input files are present for specified analysis...')
-gafFilePath = in_out.findGafFile(argsDict['input'])
-interactomeFilePath = in_out.findInteractomeFile(argsDict['input'])
-print('> DONE')
-'''
-print('> Verify correct input files are present for specified analysis...')
-gafFilePath = in_out.verifyGafFile(argsDict['gaf'])
-interactomeFilePath = in_out.verifyInteractomeFile(argsDict['interactome'])
-print('> DONE')
+
+if (argsDict['interactome'] and argsDict['gaf'] != False) and (argsDict['directory_input'] == False):
+  gafFilePath = in_out.verifyGafFile(argsDict['gaf'])
+  interactomeFilePath = in_out.verifyInteractomeFile(argsDict['interactome'])
+  print('> DONE')
+
+elif (argsDict['directory_input'] != False) and ((argsDict['interactome'] and argsDict['gaf']) == False):
+  gafFilePath = in_out.findGafFile(argsDict['directory_input'])
+  interactomeFilePath = in_out.findInteractomeFile(argsDict['directory_input'])
+  print('> DONE')
+
+else:
+  print('ERCgo unable to parse flags included in command.')
+  print('ERCgo expects the -i and -g flags together or the -d flag by itself.')
+  sys.exit('Terminating ERCgo.')
 
 print('---------------------------------------------------------------------------------------------------')
 print('OUTPUT')
