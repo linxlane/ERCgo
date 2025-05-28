@@ -1,9 +1,15 @@
-ERCgo is an experimental, proof of concept python program to analyze the gene ontology of ERCnet output.
-
-python3 ERCgo -i my_erc_net_ouput -g tair.gaf -o analysis_OUT
-
+ERCgo is an experimental, proof of concept python program which analyzes the gene ontology of ERCnet/interactome networks.
+'''
+python3 ERCgo -i network_file -g tair.gaf
+'''
+or
+'''
+python3 ERCgo -d my_input_files
+'''
 | Short flag | Long flag         | Description | Required? |
 |------------|-------------------|-------------|-----------|
-| -i         | --input           | Path to ERCnet output files. This must contain one edge and one vertices file to analyze. | Yes |
-| -g         | --gaf             | Path to gaf file. https://geneontology.org/docs/download-go-annotations/| Yes |
-| -o         | --output          | Path to output folder where files generated during analysis will be written. This directory must be created prior to running analysis. | Yes |
+| -j         | --job_name        | Job name for this run of ERCgo. If a directory with this job name already exists at the output path, it will be erased and rewritten. Avoid including spaces or special characters ("_" is ok) | Yes |
+| -i         | --interactome     | Path to interactome that will be used for the GO analysis | Yes |
+| -g         | --gaf             | Path to gene association file that will be used for the GO analysis (https://geneontology.org/docs/download-go-annotations/)| Yes |
+| -d         | --directory_input | Path to directory which contains the interactome and gene association files that will be used in the GO analysis | Yes |
+| -o         | --output          | Path where new directory for ERCgo output will be created with the job name. If not included, it will be written in the ERCgo OUTPUT directory. If this path already exists, it will be deleted and a new directory will be created at the output_directory/job_name path. | Yes |
