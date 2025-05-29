@@ -128,8 +128,8 @@ def scatterPlot(goAnalysisDf, argsDict):
     plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   '''
 
-  plt.xscale('log')
-  plt.yscale('log')
+  #plt.xscale('log')
+  #plt.yscale('log')
   plt.xlabel('log(Overlap_Score)')
   plt.ylabel('log(Confidence_Value)')
   plt.title('Interactome Hits')
@@ -138,15 +138,8 @@ def scatterPlot(goAnalysisDf, argsDict):
 
 
 def filterHits(goAnalysisDf):
-    hitsDf = goAnalysisDf[goAnalysisDf['P_Pval'] <= 0.0001]
-    hitsDf = hitsDf[hitsDf['Confidence_Value'] >= 0.4]
-    hitsDf = hitsDf[hitsDf['Slope'] > 0]
-    # nonHitsDf = goAnalysisDf[goAnalysisDf['P_Pval'] > 0.0001]
-    # nonHitsDf = nonHitsDf[nonHitsDf['Confidence_Value'] < 0.4]
-
-    nonHitsFilter = goAnalysisDf[(goAnalysisDf['P_Pval'] > 0.0001) | (goAnalysisDf['Confidence_Value'] < 0.4)]
-    print(nonHitsFilter.head())
-    print('--------------------------------------')
+    hitsDf = goAnalysisDf[goAnalysisDf['Confidence_Value'] >= 1]
+    nonHitsFilter = goAnalysisDf[goAnalysisDf['Confidence_Value'] == 0]
     return hitsDf, nonHitsFilter
 
 
