@@ -225,7 +225,7 @@ print('Read GO analysis file into a dataframe')
 print('---------------------------------------------------------------------------------------------------')
 goAnalysisFilePath = argsDict['input']
 try:
-    goAnalysisDf = pandas.read_csv(goAnalysisFilePath, sep='\t')
+    goAnalysisDf = pandas.read_csv(goAnalysisFilePath, sep='\t', engine='python')
     print('> Successful!')
 except:
     sys.exit('There was a problem reading the provided Go analysis file. Please check your input and try again. Terminating script.')
