@@ -183,12 +183,15 @@ def permutationTest(hits, nonHits):
         nonHitMeansList.append(nonHitsMean)
         nonHitPropList.append(nonHitsPropSamp)
 
-    print('hits division: ' + str(hitsProp))
-    print('hits mean: ' + str(hitsMean))
-    print(nonHitMeansList)
-    print(nonHitPropList)
     nonHitsPropFull = len(nonHits[nonHits > 0]) / len(nonHits)
-    print('Full division: ' + str(nonHitsPropFull))
+
+    print('> Writing to file...')
+    with open(argsDict['output'] + '/permutation_stats.txt', "a") as f:
+      f.write('Hits Proportion: ' + str(hitsProp) + '\n')
+      f.write('Hits Mean: ' + str(hitsMean) + '\n')
+      f.write('Non-hits Proportion: ' + str(nonHitsPropFull) + '\n')
+      f.close()
+    print('> Successful!')
 
     return hitsMean, hitsProp, nonHitMeansList, nonHitPropList
 
@@ -263,20 +266,15 @@ if argsDict['mode'] == 'full':
   hits, nonHits = filterHits(goAnalysisDf)
   # print(type(hits))
   # print(type(nonHits))
-  print('Hit Rows')
-  print(len(hits))
-  print('Non-Hit Rows')
-  print(len(nonHits))
-  print('Hit Max')
-  # hitMaxLoc = hits.loc[hits['Overlap_Score'] == 0.1361111111111111]
-  # print(hitMaxLoc)
-  print(hits['Overlap_Score'].max())
-  print('Non-Hit Max')
-  print(nonHits['Overlap_Score'].max())
-  print('Hit Value Counts')
-  print(hits['Overlap_Score'].value_counts())
-  print('Non-Hit Value Counts')
-  print(nonHits['Overlap_Score'].value_counts())
+  print('> Calculating basic stats for hits and non-hits')
+  print('> Writing to file...')
+  with open(argsDict['output'] + '/permutation_stats.txt', "w") as f:
+    f.write('Hits Rows: ' + str(len(hits)) + '\n')
+    f.write('Non-hit Rows: ' + str(len(nonHits)) + '\n')
+    f.write('Hit Max: ' + str(hits['Overlap_Score'].max()) + '\n')
+    f.write('Non-hit Max: ' + str(nonHits['Overlap_Score'].max()) + '\n')
+    f.close()
+  print('> Successful!')
 
   hitsMean, hitsProp, nonHitsMeansList, nonHitsPropList = permutationTest(hits['Overlap_Score'], nonHits['Overlap_Score'])
 
