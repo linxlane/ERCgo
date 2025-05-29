@@ -155,7 +155,7 @@ def plotPropKde(nonHitsProps, hitsProp):
     plt.axvline(x=hitsProp, color='red', linestyle='--')
     plt.title('Proportion KDE')
     plt.xlabel('len(nonHitsSample > 0)/len(nonHitsSample)')
-    plt.savefig('permutation_prop_KDE.pdf', format='pdf')
+    plt.savefig(argsDict['output'] + '/permutation_prop_KDE.pdf', format='pdf')
 
 
 def plotMeanKde(nonHitsMeans, hitsMean):
@@ -164,7 +164,7 @@ def plotMeanKde(nonHitsMeans, hitsMean):
     plt.axvline(x=hitsMean, color='red', linestyle='--')
     plt.title('Mean KDE')
     plt.xlabel('1000 means of non-hit samples')
-    plt.savefig('permutation_mean_KDE.pdf', format='pdf')
+    plt.savefig(argsDict['output'] + '/permutation_mean_KDE.pdf', format='pdf')
 
 
 def mannwhitney(hits, nonhits):
