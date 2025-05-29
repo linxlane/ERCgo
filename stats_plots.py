@@ -23,16 +23,17 @@ def checkOutputDirectory(outPath):
   return outPath
 
 
-def pearsonCorrelation(ercData):
+def pearsonCorrelation(goAnalysisDf):
   # Calculate Pearson correlation and p-value
-  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['Confidence_Value'])
+  pearson_corr, pearson_pval = pearsonr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
   print('pearson_corr: ' + str(pearson_corr))
   print('pearson_pval: ' + str(pearson_pval))
+  
 
 
-def spearmanCorrelation(ercData):
+def spearmanCorrelation(goAnalysisDf):
   # Calculate Pearson correlation and p-value
-  spearman_corr, spearman_pval = spearmanr(ercData['Overlap_Score'], ercData['Confidence_Value'])
+  spearman_corr, spearman_pval = spearmanr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
   print('spearman_corr: ' + str(spearman_corr))
   print('spearman_pval: ' + str(spearman_pval))
 
@@ -42,12 +43,12 @@ def negLog10(col):
   return values
 
 
-def scatterPlot(ercData, argsDict):
-  # print(ercData.head(50))
+def scatterPlot(goAnalysisDf, argsDict):
+  # print(goAnalysisDf.head(50))
   # print('------------------------------------')
 
-  smallValue = ercData['Overlap_Score'][ercData['Overlap_Score'] != 0].min()
-  replaceZerosDF = ercData.replace(to_replace=0, value=smallValue)
+  smallValue = goAnalysisDf['Overlap_Score'][goAnalysisDf['Overlap_Score'] != 0].min()
+  replaceZerosDF = goAnalysisDf.replace(to_replace=0, value=smallValue)
   # print(replaceZerosDF.head(50))
 
   # replaceZerosDF['negLog10'] = negLog10(replaceZerosDF['P_Pval'])
@@ -136,14 +137,14 @@ def scatterPlot(ercData, argsDict):
   plt.savefig(argsDict['output'] + '/Interactome_scatterplot.pdf', format='pdf')
 
 
-def filterHits(ercData):
-    hitsDf = ercData[ercData['P_Pval'] <= 0.0001]
+def filterHits(goAnalysisDf):
+    hitsDf = goAnalysisDf[goAnalysisDf['P_Pval'] <= 0.0001]
     hitsDf = hitsDf[hitsDf['Confidence_Value'] >= 0.4]
     hitsDf = hitsDf[hitsDf['Slope'] > 0]
-    # nonHitsDf = ercData[ercData['P_Pval'] > 0.0001]
+    # nonHitsDf = goAnalysisDf[goAnalysisDf['P_Pval'] > 0.0001]
     # nonHitsDf = nonHitsDf[nonHitsDf['Confidence_Value'] < 0.4]
 
-    nonHitsFilter = ercData[(ercData['P_Pval'] > 0.0001) | (ercData['Confidence_Value'] < 0.4)]
+    nonHitsFilter = goAnalysisDf[(goAnalysisDf['P_Pval'] > 0.0001) | (goAnalysisDf['Confidence_Value'] < 0.4)]
     print(nonHitsFilter.head())
     print('--------------------------------------')
     return hitsDf, nonHitsFilter
@@ -229,28 +230,37 @@ print('-------------------------------------------------------------------------
 goAnalysisFilePath = argsDict['input']
 try:
     goAnalysisDf = pandas.read_csv(goAnalysisFilePath, sep='\t')
-    print('Successful!')
+    print('> Successful!')
 except:
     sys.exit('There was a problem reading the provided Go analysis file. Please check your input and try again. Terminating script.')
-
 
 print('---------------------------------------------------------------------------------------------------')
 print('Correlation Statistics')
 print('---------------------------------------------------------------------------------------------------')
+
 slope = linregress(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value']).slope
 print(f'linregress slope: {slope}')
 
-pearsonCorrelation(goAnalysisDf)
-spearmanCorrelation(goAnalysisDf)
+pearson_corr, pearson_pval = pearsonr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
+spearman_corr, spearman_pval = spearmanr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
+
+
+with open(argsDict['output'] + '/correlation_stats.txt', "w") as f:
+  f.write('All statistics calculated using scipy stats:\n')
+  f.write('linregress_slope: ' + str(slope) + '\n')
+  f.write('pearson_corr: ' + str(pearson_corr) + '\n')
+  f.write('pearson_pval: ' + str(pearson_pval) + '\n')
+  f.write('spearman_corr: ' + str(spearman_corr) + '\n')
+  f.write('spearman_pval: ' + str(spearman_pval) + '\n')
 
 print('---------------------------------------------------------------------------------------------------')
 print('Scatterplot')
 print('---------------------------------------------------------------------------------------------------')
 if argsDict['mode'] == 'hits':
-  print('Generating scatterplot...')
+  print('> Generating scatterplot...')
   scatterPlot(goAnalysisDf, argsDict)
 else:
-  print('Full mode activated. Skip scatterplot.')
+  print('> Full mode activated. Skip scatterplot.')
 
 print('---------------------------------------------------------------------------------------------------')
 print('Permutation Test and KDE')
@@ -279,7 +289,7 @@ if argsDict['mode'] == 'full':
   plotPropKde(nonHitsPropList, hitsProp)
   plotMeanKde(nonHitsMeansList, hitsMean)
 else:
-   print('Hits mode activated. Skip permutation test.')
+   print('> Hits mode activated. Skip permutation test.')
 
 print('\n')
 print('###########################################')
