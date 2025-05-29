@@ -237,11 +237,13 @@ except:
 print('---------------------------------------------------------------------------------------------------')
 print('Correlation Statistics')
 print('---------------------------------------------------------------------------------------------------')
+print('> Generating correlation statistics...')
 
 slope = linregress(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value']).slope
 pearson_corr, pearson_pval = pearsonr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
 spearman_corr, spearman_pval = spearmanr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
 
+print('> Writing to file...')
 with open(argsDict['output'] + '/correlation_stats.txt', "w") as f:
   f.write('All statistics calculated using scipy stats:\n')
   f.write('linregress_slope: ' + str(slope) + '\n')
@@ -249,6 +251,7 @@ with open(argsDict['output'] + '/correlation_stats.txt', "w") as f:
   f.write('pearson_pval: ' + str(pearson_pval) + '\n')
   f.write('spearman_corr: ' + str(spearman_corr) + '\n')
   f.write('spearman_pval: ' + str(spearman_pval) + '\n')
+print('> Successful!')
 
 print('---------------------------------------------------------------------------------------------------')
 print('Scatterplot')
@@ -256,6 +259,7 @@ print('-------------------------------------------------------------------------
 if argsDict['mode'] == 'hits':
   print('> Generating scatterplot...')
   scatterPlot(goAnalysisDf, argsDict)
+  print('> Successful!')
 else:
   print('> Full mode activated. Skip scatterplot.')
 
@@ -288,8 +292,7 @@ if argsDict['mode'] == 'full':
 else:
    print('> Hits mode activated. Skip permutation test.')
 
-print('\n')
+print()
 print('###########################################')
 print('Statistical analysis and plotting complete!')
 print('###########################################')
-print('\n')
