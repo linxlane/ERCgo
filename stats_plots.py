@@ -239,11 +239,8 @@ print('Correlation Statistics')
 print('---------------------------------------------------------------------------------------------------')
 
 slope = linregress(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value']).slope
-print(f'linregress slope: {slope}')
-
 pearson_corr, pearson_pval = pearsonr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
 spearman_corr, spearman_pval = spearmanr(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value'])
-
 
 with open(argsDict['output'] + '/correlation_stats.txt', "w") as f:
   f.write('All statistics calculated using scipy stats:\n')
