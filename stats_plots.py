@@ -1,4 +1,5 @@
 import argparse
+import sys
 import glob
 import os
 import shutil
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import mannwhitneyu, rankdata, pearsonr, spearmanr, linregress
 
+
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
     print('> A directory does not exist at this path.')
@@ -16,27 +18,21 @@ def checkOutputDirectory(outPath):
     print('Successful', end='\n')
   else:
     print('> Existing output directory found.')
-    print('> Deleting directory to start fresh.')
-    shutil.rmtree(os.path.abspath(outPath))
-    print(
-        '> Making new directory for writing all output files...', flush=True, end=''
-    )
-    os.makedirs(outPath)
-    print('Successful', end='\n')
+    print('> Successful', end='\n')
 
   return outPath
 
 
 def pearsonCorrelation(ercData):
   # Calculate Pearson correlation and p-value
-  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['P_R2'])
+  pearson_corr, pearson_pval = pearsonr(ercData['Overlap_Score'], ercData['Confidence_Value'])
   print('pearson_corr: ' + str(pearson_corr))
   print('pearson_pval: ' + str(pearson_pval))
 
 
 def spearmanCorrelation(ercData):
   # Calculate Pearson correlation and p-value
-  spearman_corr, spearman_pval = spearmanr(ercData['Overlap_Score'], ercData['P_R2'])
+  spearman_corr, spearman_pval = spearmanr(ercData['Overlap_Score'], ercData['Confidence_Value'])
   print('spearman_corr: ' + str(spearman_corr))
   print('spearman_pval: ' + str(spearman_pval))
 
@@ -46,7 +42,7 @@ def negLog10(col):
   return values
 
 
-def scatterPlot(ercData):
+def scatterPlot(ercData, argsDict):
   # print(ercData.head(50))
   # print('------------------------------------')
 
@@ -70,7 +66,7 @@ def scatterPlot(ercData):
   allPoints = sns.scatterplot(
       data=replaceZerosDF[noInterestMask],
       x='Overlap_Score',
-      y='P_R2',
+      y='Confidence_Value',
       marker='X',
       color='green',
       zorder=1,
@@ -78,7 +74,7 @@ def scatterPlot(ercData):
   rprRprPlot = sns.scatterplot(
       data=replaceZerosDF[interestInterestMask],
       x='Overlap_Score',
-      y='P_R2',
+      y='Confidence_Value',
       marker='o',
       color='yellow',
       zorder=2,
@@ -86,7 +82,7 @@ def scatterPlot(ercData):
   rpnRpnPlot = sns.scatterplot(
       data=replaceZerosDF[interestClpMask],
       x='Overlap_Score',
-      y='P_R2',
+      y='Confidence_Value',
       marker='o',
       color='blue',
       zorder=2,
@@ -94,7 +90,7 @@ def scatterPlot(ercData):
   betaBetaPlot = sns.scatterplot(
       data=replaceZerosDF[clpInterestMask],
       x='Overlap_Score',
-      y='P_R2',
+      y='Confidence_Value',
       marker='o',
       color='blue',
       zorder=2,
@@ -102,7 +98,7 @@ def scatterPlot(ercData):
   alphaAlphaPlot = sns.scatterplot(
       data=replaceZerosDF[clpClpMask],
       x='Overlap_Score',
-      y='P_R2',
+      y='Confidence_Value',
       marker='o',
       color='red',
       zorder=2,
@@ -111,41 +107,43 @@ def scatterPlot(ercData):
   '''
   for point in range(len(rpnRpnDF)):
     label = getAGI(rpnRpnDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rpnRpnDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
   for point in range(len(rptRptDF)):
     label = getAGI(rptRptDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rptRptDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
+    plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
 
 
   for point in range(len(betaBetaDF)):
     label = getAGI(betaBetaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(betaBetaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
+    plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
   for point in range(len(alphaAlphaDF)):
     label = getAGI(alphaAlphaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(alphaAlphaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+    plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   
   for point in range(len(otherDF)):
     label = getAGI(otherDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(otherDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
+    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['Confidence_Value'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
   '''
 
   plt.xscale('log')
+  plt.yscale('log')
   plt.xlabel('log(Overlap_Score)')
-  plt.ylabel('P_R2')
-  plt.title('Clp R2T Hits')
-  plt.show()
+  plt.ylabel('log(Confidence_Value)')
+  plt.title('Interactome Hits')
+  #plt.show()
+  plt.savefig(argsDict['output'] + '/Interactome_scatterplot.pdf', format='pdf')
 
 
 def filterHits(ercData):
     hitsDf = ercData[ercData['P_Pval'] <= 0.0001]
-    hitsDf = hitsDf[hitsDf['P_R2'] >= 0.4]
+    hitsDf = hitsDf[hitsDf['Confidence_Value'] >= 0.4]
     hitsDf = hitsDf[hitsDf['Slope'] > 0]
     # nonHitsDf = ercData[ercData['P_Pval'] > 0.0001]
-    # nonHitsDf = nonHitsDf[nonHitsDf['P_R2'] < 0.4]
+    # nonHitsDf = nonHitsDf[nonHitsDf['Confidence_Value'] < 0.4]
 
-    nonHitsFilter = ercData[(ercData['P_Pval'] > 0.0001) | (ercData['P_R2'] < 0.4)]
+    nonHitsFilter = ercData[(ercData['P_Pval'] > 0.0001) | (ercData['Confidence_Value'] < 0.4)]
     print(nonHitsFilter.head())
     print('--------------------------------------')
     return hitsDf, nonHitsFilter
@@ -159,6 +157,7 @@ def plotPropKde(nonHitsProps, hitsProp):
     plt.xlabel('len(nonHitsSample > 0)/len(nonHitsSample)')
     plt.savefig('permutation_prop_KDE.pdf', format='pdf')
 
+
 def plotMeanKde(nonHitsMeans, hitsMean):
     plt.figure()
     sns.kdeplot(nonHitsMeans)
@@ -166,6 +165,7 @@ def plotMeanKde(nonHitsMeans, hitsMean):
     plt.title('Mean KDE')
     plt.xlabel('1000 means of non-hit samples')
     plt.savefig('permutation_mean_KDE.pdf', format='pdf')
+
 
 def mannwhitney(hits, nonhits):
     # Perform the one-sided Mann-Whitney U test (sample1 > sample2)
@@ -200,7 +200,7 @@ def permutationTest(hits, nonHits):
 
 
 def plotFullData(fullErcData):
-    agg = ds.Canvas().points(fullErcData, 'Overlap_Score', 'P_R2')
+    agg = ds.Canvas().points(fullErcData, 'Overlap_Score', 'Confidence_Value')
     ds.tf.set_background(ds.tf.shade(agg, cmap=cc.fire), 'black')
 
 
@@ -211,26 +211,33 @@ print('################################################')
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-i', '--input', required=True, metavar='file_path', help='''Path to ERCgo GO_ANALYSIS file''')
+parser.add_argument('-m', '--mode', required=True, choices=['hits', 'full'], help='''Specifies what stats and plots to genereate depending on the input analysis type.''')
+parser.add_argument('-o', '--output', required=True, metavar='dir_path', help='''Path to output directory. If this directory does not exist at runtime, stats_plots will create it.''')
+
 
 args = parser.parse_args()
 argsDict = vars(args)
 
-goAnalysisFilePath = argsDict['input']
+print('---------------------------------------------------------------------------------------------------')
+print('Check output directory')
+print('---------------------------------------------------------------------------------------------------')
+checkOutputDirectory(argsDict['output'])
 
 print('---------------------------------------------------------------------------------------------------')
 print('Read GO analysis file into a dataframe')
 print('---------------------------------------------------------------------------------------------------')
+goAnalysisFilePath = argsDict['input']
 try:
     goAnalysisDf = pandas.read_csv(goAnalysisFilePath, sep='\t')
-    print(goAnalysisDf.head())
     print('Successful!')
 except:
-    print('There was a problem reading the provided Go analysis file. Please check your input and try again.')
+    sys.exit('There was a problem reading the provided Go analysis file. Please check your input and try again. Terminating script.')
+
 
 print('---------------------------------------------------------------------------------------------------')
 print('Correlation Statistics')
 print('---------------------------------------------------------------------------------------------------')
-slope = linregress(goAnalysisDf['Overlap_Score'], goAnalysisDf['P_R2']).slope
+slope = linregress(goAnalysisDf['Overlap_Score'], goAnalysisDf['Confidence_Value']).slope
 print(f'linregress slope: {slope}')
 
 pearsonCorrelation(goAnalysisDf)
@@ -239,48 +246,41 @@ spearmanCorrelation(goAnalysisDf)
 print('---------------------------------------------------------------------------------------------------')
 print('Scatterplot')
 print('---------------------------------------------------------------------------------------------------')
-scatterPlot(goAnalysisDf)
-# print('Skip')
+if argsDict['mode'] == 'hits':
+  print('Generating scatterplot...')
+  scatterPlot(goAnalysisDf, argsDict)
+else:
+  print('Full mode activated. Skip scatterplot.')
 
-# print('---------------------------------------------------------------------------------------------------')
-# print('Datashader')
-# print('---------------------------------------------------------------------------------------------------')
-# plotFullData(goAnalysisDf)
-'''
 print('---------------------------------------------------------------------------------------------------')
 print('Permutation Test and KDE')
 print('---------------------------------------------------------------------------------------------------')
+if argsDict['mode'] == 'full':
+  hits, nonHits = filterHits(goAnalysisDf)
+  # print(type(hits))
+  # print(type(nonHits))
+  print('Hit Rows')
+  print(len(hits))
+  print('Non-Hit Rows')
+  print(len(nonHits))
+  print('Hit Max')
+  # hitMaxLoc = hits.loc[hits['Overlap_Score'] == 0.1361111111111111]
+  # print(hitMaxLoc)
+  print(hits['Overlap_Score'].max())
+  print('Non-Hit Max')
+  print(nonHits['Overlap_Score'].max())
+  print('Hit Value Counts')
+  print(hits['Overlap_Score'].value_counts())
+  print('Non-Hit Value Counts')
+  print(nonHits['Overlap_Score'].value_counts())
 
-hits, nonHits = filterHits(goAnalysisDf)
-# print(type(hits))
-# print(type(nonHits))
-print('Hit Rows')
-print(len(hits))
-print('Non-Hit Rows')
-print(len(nonHits))
-print('Hit Max')
-# hitMaxLoc = hits.loc[hits['Overlap_Score'] == 0.1361111111111111]
-# print(hitMaxLoc)
-print(hits['Overlap_Score'].max())
-print('Non-Hit Max')
-print(nonHits['Overlap_Score'].max())
-print('Hit Value Counts')
-print(hits['Overlap_Score'].value_counts())
-print('Non-Hit Value Counts')
-print(nonHits['Overlap_Score'].value_counts())
+  hitsMean, hitsProp, nonHitsMeansList, nonHitsPropList = permutationTest(hits['Overlap_Score'], nonHits['Overlap_Score'])
 
-hitsMean, hitsProp, nonHitsMeansList, nonHitsPropList = permutationTest(hits['Overlap_Score'], nonHits['Overlap_Score'])
+  plotPropKde(nonHitsPropList, hitsProp)
+  plotMeanKde(nonHitsMeansList, hitsMean)
+else:
+   print('Hits mode activated. Skip permutation test.')
 
-plotPropKde(nonHitsPropList, hitsProp)
-plotMeanKde(nonHitsMeansList, hitsMean)
-
-
-# print(hits.head())
-# print(nonHits.head())
-# print('Mannwhitneyu test')
-# mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
-# kde(hits, nonHits)
-'''
 print('\n')
 print('###########################################')
 print('Statistical analysis and plotting complete!')
