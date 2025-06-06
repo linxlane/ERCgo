@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import mannwhitneyu, rankdata, pearsonr, spearmanr, linregress
+import matplotlib as mpl
 
 def checkOutputDirectory(outPath):
     if not os.path.exists(outPath):
@@ -45,10 +46,58 @@ def negLog10(col):
     values = -np.log10(col)
     return values
 
+def getAGI(compID):
+  agiDict = {'AT1G49970' : 'CLPR1',
+              'AT1G12410'	: 'CLPR2',
+              'AT1G09130'	: 'CLPR3',
+              'AT4G17040'	: 'CLPR4',
+              'AT1G66670'	: 'CLPP3',
+              'AT5G45390'	: 'CLPP4',
+              'AT1G02560'	: 'CLPP5',
+              'AT1G11750'	: 'CLPP6',
+              'AT5G51070'	: 'CLPD',
+              'AT1G68660'	: 'CLPS',
+              'AT5G50920'	: 'CLPC1',
+              'AT3G48870'	: 'CLPC2',
+              'AT4G25370'	: 'CLPT1',
+              'AT4G12060'	: 'CLPT2',
+              'ATCG00670'	: 'CLPP1',
+              'AT3G14240' : 'SBT1.5',
+              'AT1G19370' : 'mp', #membrane protein;no name 
+              'AT3G47470' : 'LHCA4', 
+              'AT3G23620' : 'ARPF2', 
+              'AT4G11960' : 'PGRL1B',
+              'AT1G08130' : 'LIG1', 
+              'AT4G12800' : 'PSAL;RALFL24', 
+              'AT5G01590' : 'TIC56', 
+              'AT4G38590' : 'BGAL14', 
+              'AT1G09850' : 'XBCP3', 
+              'AT1G52220' : 'CURT1C', 
+              'AT2G40360' : 'ATPEIP1;ATPEP1;BOP1', 
+              'AT3G09050' : '8a7o', #8-amino-7-oxononanoate synthase 
+              'AT2G47990' : 'EDA13;EDA19;SWA1', 
+              'AT1G26090' : 'P-loop', #P-loop containing nucleoside triphosphate hydrolases superfamily protein
+              'AT4G23940' : 'ARC1;FTSHI1',
+              'AT3G60830' : 'ARP7;ATARP7', 
+              'AT1G26460' : 'TPR', #Tetratricopeptide repeat (TPR)-like superfamily protein 
+              'AT1G06950' : 'ATTIC110;TIC110', 
+              'AT2G04270' : 'RNASE E', # RNASE E;RNASE E/G-LIKE;RNE;RNEE/G
+              'AT1G10510' : 'emb2004', 
+              'AT5G53080' : 'WTG1',
+              'AT3G19800' : 'DUF177B', 
+              'AT3G12380' : 'ARP5;ATARP5', 
+              'AT1G36320' : 'CDB1L'
+              }
+  
+  agi = agiDict[compID]
+  return agi
 
 def scatterPlot(ercData):
     # print(ercData.head(50))
     # print('------------------------------------')
+
+    mpl.rcParams['pdf.fonttype'] = 42
+    plt.figure(figsize=(12, 8))
 
     smallValue = ercData["Overlap_Score"][ercData["Overlap_Score"] != 0].min()
     replaceZerosDF = ercData.replace(to_replace=0, value=smallValue)
@@ -60,12 +109,14 @@ def scatterPlot(ercData):
     clpInterestMask = replaceZerosDF["Color"] == "Clp-Interest interaction"
     interestClpMask = replaceZerosDF["Color"] == "Interest-Clp interaction"
     interestInterestMask = replaceZerosDF["Color"] == "Interest-Interest"
+    noIntAbovePoint005 = replaceZerosDF['Overlap_Score'] > 0.01
     noInterestMask = replaceZerosDF["Color"] == "Not of interest"
 
     clpClpDF = replaceZerosDF[clpClpMask].reset_index()
     clpInterestDF = replaceZerosDF[clpInterestMask].reset_index()
     interestClpDF = replaceZerosDF[interestClpMask].reset_index()
     interestInterestDF = replaceZerosDF[interestInterestMask].reset_index()
+    noIntAbovePoint005DF = replaceZerosDF[noIntAbovePoint005].reset_index()
     
 
     allPoints = sns.scatterplot(
@@ -73,7 +124,7 @@ def scatterPlot(ercData):
         x="Overlap_Score",
         y="P_R2",
         marker="X",
-        color="green",
+        color="#6B6B6B",
         zorder=1,
     )
     rprRprPlot = sns.scatterplot(
@@ -89,7 +140,7 @@ def scatterPlot(ercData):
         x="Overlap_Score",
         y="P_R2",
         marker="o",
-        color="blue",
+        color="#005AB5",
         zorder=2,
     )
     betaBetaPlot = sns.scatterplot(
@@ -97,7 +148,7 @@ def scatterPlot(ercData):
         x="Overlap_Score",
         y="P_R2",
         marker="o",
-        color="blue",
+        color="#005AB5",
         zorder=2,
     )
     alphaAlphaPlot = sns.scatterplot(
@@ -105,38 +156,38 @@ def scatterPlot(ercData):
         x="Overlap_Score",
         y="P_R2",
         marker="o",
-        color="red",
+        color="#DC3220",
         zorder=2,
     )
-
-    """
-  for point in range(len(rpnRpnDF)):
-    label = getAGI(rpnRpnDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rpnRpnDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rpnRpnDF['Overlap_Score'][point], y=rpnRpnDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
-
-  for point in range(len(rptRptDF)):
-    label = getAGI(rptRptDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(rptRptDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=rptRptDF['Overlap_Score'][point], y=rptRptDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='purple')
-
-
-  for point in range(len(betaBetaDF)):
-    label = getAGI(betaBetaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(betaBetaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=betaBetaDF['Overlap_Score'][point], y=betaBetaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='orange')
   
-  for point in range(len(alphaAlphaDF)):
-    label = getAGI(alphaAlphaDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(alphaAlphaDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=alphaAlphaDF['Overlap_Score'][point], y=alphaAlphaDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
-  
-  for point in range(len(otherDF)):
-    label = getAGI(otherDF['COMP_GENE_A'][point], agiDict) + '-' + getAGI(otherDF['COMP_GENE_B'][point], agiDict)
-    plt.text(x=otherDF['Overlap_Score'][point], y=otherDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='blue')
-  """
+    for point in range(len(noIntAbovePoint005DF)):
+      label = noIntAbovePoint005DF['COMP_GENE_A'][point] + '-' + noIntAbovePoint005DF['COMP_GENE_B'][point]
+      plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#6B6B6B')
+    
+    for point in range(len(interestInterestDF)):
+      label = getAGI(interestInterestDF['COMP_GENE_A'][point]) + '-' + getAGI(interestInterestDF['COMP_GENE_B'][point])
+      plt.text(x=interestInterestDF['Overlap_Score'][point], y=interestInterestDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='yellow')
+
+    for point in range(len(interestClpDF)):
+      label = getAGI(interestClpDF['COMP_GENE_A'][point]) + '-' + getAGI(interestClpDF['COMP_GENE_B'][point])
+      plt.text(x=interestClpDF['Overlap_Score'][point], y=interestClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#005AB5')
+
+    for point in range(len(clpInterestDF)):
+      label = getAGI(clpInterestDF['COMP_GENE_A'][point]) + '-' + getAGI(clpInterestDF['COMP_GENE_B'][point])
+      plt.text(x=clpInterestDF['Overlap_Score'][point], y=clpInterestDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#005AB5')
+
+    for point in range(len(clpClpDF)):
+      label = getAGI(clpClpDF['COMP_GENE_A'][point]) + '-' + getAGI(clpClpDF['COMP_GENE_B'][point])
+      plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#DC3220')
+    
 
     plt.xscale("log")
     plt.xlabel('log(Overlap_Score)')
     plt.ylabel("P_R2")
     plt.title("Clp R2T Hits")
-    plt.show()
+    plt.savefig('/Users/linlane/Desktop/clp_paper_GO_figure_red_blue.pdf', format = 'pdf', transparent = True) 
+    plt.close()
+    #plt.show()
 
 
 def filterHits(ercData):
@@ -260,14 +311,14 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-scatterPlot(goAnalysisDf)
+#scatterPlot(goAnalysisDf)
 #print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
 # print('---------------------------------------------------------------------------------------------------')
 # plotFullData(goAnalysisDf)
-'''
+
 print(
     "---------------------------------------------------------------------------------------------------"
 )
@@ -305,7 +356,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-'''
+
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
