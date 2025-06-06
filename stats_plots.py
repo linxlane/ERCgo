@@ -192,12 +192,17 @@ def scatterPlot(ercData):
 
 def filterHits(ercData):
     hitsDf = ercData[ercData["P_Pval"] <= 0.0001]
-    hitsDf = hitsDf[hitsDf["P_R2"] >=0.4]
+    hitsDf = hitsDf[hitsDf["S_Pval"] <= 0.0001]
+    hitsDf = hitsDf[hitsDf["P_R2"] >= 0.5]
+    hitsDf = hitsDf[hitsDf["S_R2"] >= 0.5]
     hitsDf = hitsDf[hitsDf["Slope"] > 0]
     #nonHitsDf = ercData[ercData["P_Pval"] > 0.0001]
     #nonHitsDf = nonHitsDf[nonHitsDf["P_R2"] < 0.4]
+    print('Length of hits: ' + str(len(hitsDf)))
 
-    nonHitsFilter = ercData[(ercData['P_Pval'] > 0.0001) | (ercData['P_R2'] < 0.4)]
+    nonHitsFilter = ercData[(ercData['P_Pval'] > 0.0001) | (ercData['P_R2'] < 0.5)| (ercData['S_R2'] < 0.5) | (ercData['S_Pval'] > 0.0001)]
+    print('Length of non-hits: ' + str(len(hitsDf)))
+
     print(nonHitsFilter.head())
     print('--------------------------------------')
     return hitsDf, nonHitsFilter
@@ -328,6 +333,7 @@ print(
 )
 
 hits, nonHits = filterHits(goAnalysisDf)
+'''
 # print(type(hits))
 # print(type(nonHits))
 print("Hit Rows")
@@ -356,7 +362,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-
+'''
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
