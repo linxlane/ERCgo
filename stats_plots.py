@@ -30,14 +30,14 @@ def checkOutputDirectory(outPath):
 
 def pearsonCorrelation(ercData):
     # Calculate Pearson correlation and p-value
-    pearson_corr, pearson_pval = pearsonr(ercData["Overlap_Score"], ercData["P_R2"])
+    pearson_corr, pearson_pval = pearsonr(ercData["Overlap_Score"], ercData["R2_Average"])
     print("pearson_corr: " + str(pearson_corr))
     print("pearson_pval: " + str(pearson_pval))
 
 
 def spearmanCorrelation(ercData):
     # Calculate Pearson correlation and p-value
-    spearman_corr, spearman_pval = spearmanr(ercData["Overlap_Score"], ercData["P_R2"])
+    spearman_corr, spearman_pval = spearmanr(ercData["Overlap_Score"], ercData["R2_Average"])
     print("spearman_corr: " + str(spearman_corr))
     print("spearman_pval: " + str(spearman_pval))
 
@@ -221,6 +221,7 @@ def filterHits(ercData):
 
 
 def plotPropKde(nonHitsProps, hitsProp):
+    mpl.rcParams['pdf.fonttype'] = 42
     plt.figure()
     sns.kdeplot(nonHitsProps)
     plt.axvline(x=hitsProp, color='red', linestyle='--')
@@ -229,6 +230,7 @@ def plotPropKde(nonHitsProps, hitsProp):
     plt.savefig('permutation_prop_KDE.pdf', format='pdf')
 
 def plotMeanKde(nonHitsMeans, hitsMean):
+    mpl.rcParams['pdf.fonttype'] = 42
     plt.figure()
     sns.kdeplot(nonHitsMeans)
     plt.axvline(x=hitsMean, color='red', linestyle='--')
@@ -266,11 +268,6 @@ def permutationTest(hits, nonHits):
     print("Full division: " + str(nonHitsPropFull))
 
     return hitsMean, hitsProp, nonHitMeansList, nonHitPropList
-
-
-def plotFullData(fullErcData):
-    agg = ds.Canvas().points(fullErcData, "Overlap_Score", "P_R2")
-    ds.tf.set_background(ds.tf.shade(agg, cmap=cc.fire), "black")
 
 
 ##Start of main stat and plotting script
@@ -320,7 +317,7 @@ print("Correlation Statistics")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-slope = linregress(goAnalysisDf["Overlap_Score"], goAnalysisDf["P_R2"]).slope
+slope = linregress(goAnalysisDf["Overlap_Score"], goAnalysisDf["R2_Average"]).slope
 print(f"linregress slope: {slope}")
 
 pearsonCorrelation(goAnalysisDf)
@@ -333,8 +330,8 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-scatterPlot(goAnalysisDf)
-#print("Skip")
+#scatterPlot(goAnalysisDf)
+print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
@@ -349,8 +346,8 @@ print(
     "---------------------------------------------------------------------------------------------------"
 )
 
-#hits, nonHits = filterHits(goAnalysisDf)
-'''
+hits, nonHits = filterHits(goAnalysisDf)
+
 # print(type(hits))
 # print(type(nonHits))
 print("Hit Rows")
@@ -379,7 +376,7 @@ plotMeanKde(nonHitsMeansList, hitsMean)
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-'''
+
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
