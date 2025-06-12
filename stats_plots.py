@@ -92,6 +92,18 @@ def getAGI(compID):
   agi = agiDict[compID]
   return agi
 
+def averageR2Values(ercData):
+  averagesList = []
+  p_r2List = ercData['P_R2'].tolist()
+  s_r2List = ercData['S_R2'].tolist()
+
+  for i in range(len(ercData)):
+    average = (p_r2List[i] + s_r2List[i]) / 2
+    averagesList.append(average)
+
+  ercData['R2_Average'] = averagesList
+
+
 def scatterPlot(ercData):
     # print(ercData.head(50))
     # print('------------------------------------')
@@ -109,7 +121,7 @@ def scatterPlot(ercData):
     clpInterestMask = replaceZerosDF["Color"] == "Clp-Interest interaction"
     interestClpMask = replaceZerosDF["Color"] == "Interest-Clp interaction"
     interestInterestMask = replaceZerosDF["Color"] == "Interest-Interest"
-    noIntAbovePoint005 = replaceZerosDF['Overlap_Score'] > 0.01
+    noIntAbovePoint005 = (replaceZerosDF['Overlap_Score'] > 0.005) & (replaceZerosDF["Color"] != "Clp-Clp interaction") & (replaceZerosDF['R2_Average'] > 0.8)
     noInterestMask = replaceZerosDF["Color"] == "Not of interest"
 
     clpClpDF = replaceZerosDF[clpClpMask].reset_index()
@@ -122,7 +134,7 @@ def scatterPlot(ercData):
     allPoints = sns.scatterplot(
         data=replaceZerosDF[noInterestMask],
         x="Overlap_Score",
-        y="P_R2",
+        y="R2_Average",
         marker="X",
         color="#6B6B6B",
         zorder=1,
@@ -130,7 +142,7 @@ def scatterPlot(ercData):
     rprRprPlot = sns.scatterplot(
         data=replaceZerosDF[interestInterestMask],
         x="Overlap_Score",
-        y="P_R2",
+        y="R2_Average",
         marker="o",
         color="yellow",
         zorder=2,
@@ -138,54 +150,54 @@ def scatterPlot(ercData):
     rpnRpnPlot = sns.scatterplot(
         data=replaceZerosDF[interestClpMask],
         x="Overlap_Score",
-        y="P_R2",
+        y="R2_Average",
         marker="o",
-        color="#005AB5",
+        color="#5D3A9B",
         zorder=2,
     )
     betaBetaPlot = sns.scatterplot(
         data=replaceZerosDF[clpInterestMask],
         x="Overlap_Score",
-        y="P_R2",
+        y="R2_Average",
         marker="o",
-        color="#005AB5",
+        color="#5D3A9B",
         zorder=2,
     )
     alphaAlphaPlot = sns.scatterplot(
         data=replaceZerosDF[clpClpMask],
         x="Overlap_Score",
-        y="P_R2",
+        y="R2_Average",
         marker="o",
-        color="#DC3220",
+        color="#E20202",
         zorder=2,
     )
   
     for point in range(len(noIntAbovePoint005DF)):
       label = noIntAbovePoint005DF['COMP_GENE_A'][point] + '-' + noIntAbovePoint005DF['COMP_GENE_B'][point]
-      plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#6B6B6B')
+      plt.text(x=noIntAbovePoint005DF['Overlap_Score'][point], y=noIntAbovePoint005DF['R2_Average'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#6B6B6B')
     
     for point in range(len(interestInterestDF)):
       label = getAGI(interestInterestDF['COMP_GENE_A'][point]) + '-' + getAGI(interestInterestDF['COMP_GENE_B'][point])
-      plt.text(x=interestInterestDF['Overlap_Score'][point], y=interestInterestDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='yellow')
+      plt.text(x=interestInterestDF['Overlap_Score'][point], y=interestInterestDF['R2_Average'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='yellow')
 
     for point in range(len(interestClpDF)):
       label = getAGI(interestClpDF['COMP_GENE_A'][point]) + '-' + getAGI(interestClpDF['COMP_GENE_B'][point])
-      plt.text(x=interestClpDF['Overlap_Score'][point], y=interestClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#005AB5')
+      plt.text(x=interestClpDF['Overlap_Score'][point], y=interestClpDF['R2_Average'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#5D3A9B')
 
     for point in range(len(clpInterestDF)):
       label = getAGI(clpInterestDF['COMP_GENE_A'][point]) + '-' + getAGI(clpInterestDF['COMP_GENE_B'][point])
-      plt.text(x=clpInterestDF['Overlap_Score'][point], y=clpInterestDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#005AB5')
+      plt.text(x=clpInterestDF['Overlap_Score'][point], y=clpInterestDF['R2_Average'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#5D3A9B')
 
     for point in range(len(clpClpDF)):
       label = getAGI(clpClpDF['COMP_GENE_A'][point]) + '-' + getAGI(clpClpDF['COMP_GENE_B'][point])
-      plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['P_R2'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#DC3220')
+      plt.text(x=clpClpDF['Overlap_Score'][point], y=clpClpDF['R2_Average'][point], s=label, horizontalalignment='center', verticalalignment='bottom', color='#E20202')
     
 
     plt.xscale("log")
     plt.xlabel('log(Overlap_Score)')
-    plt.ylabel("P_R2")
+    plt.ylabel("R2_Average")
     plt.title("Clp R2T Hits")
-    plt.savefig('/Users/linlane/Desktop/clp_paper_GO_figure_red_blue.pdf', format = 'pdf', transparent = True) 
+    plt.savefig('/Users/linlane/Desktop/clp_paper_GO_figure_avg_R2.pdf', format = 'pdf', transparent = True) 
     plt.close()
     #plt.show()
 
@@ -299,6 +311,11 @@ except:
 print(
     "---------------------------------------------------------------------------------------------------"
 )
+print("Average P_R2 and S_R2")
+print("---------------------------------------------------------------------------------------------------")
+averageR2Values(goAnalysisDf)
+print(goAnalysisDf.head())
+
 print("Correlation Statistics")
 print(
     "---------------------------------------------------------------------------------------------------"
@@ -316,7 +333,7 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-#scatterPlot(goAnalysisDf)
+scatterPlot(goAnalysisDf)
 #print("Skip")
 
 # print('---------------------------------------------------------------------------------------------------')
@@ -332,7 +349,7 @@ print(
     "---------------------------------------------------------------------------------------------------"
 )
 
-hits, nonHits = filterHits(goAnalysisDf)
+#hits, nonHits = filterHits(goAnalysisDf)
 '''
 # print(type(hits))
 # print(type(nonHits))
