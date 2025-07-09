@@ -7,6 +7,9 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
   #Create new list to store each row of gene pairs and GO terms
   geneGOList = []
 
+  #Create counter for genes with no GO terms
+  nonePairCounter = 0
+
   #Iterate through each gene pair and get GO terms
   with open(genePairsPath, 'r') as genePairs:
     #Skip first line with column titles
@@ -39,6 +42,10 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
 
         #Append 'new row' to table
         geneGOList.append(matchingGoList)
+      else:
+        nonePairCounter += 1
+
+  print(f' > {nonePairCounter} gene pairs dropped due to both gene A and gene B having zero GO terms.')
 
   ##Write table to file
   if argsDict['analysis'] == 'hits':
