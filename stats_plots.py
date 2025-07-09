@@ -238,6 +238,11 @@ def plotMeanKde(nonHitsMeans, hitsMean):
     plt.xlabel('1000 means of non-hit samples')
     plt.savefig('permutation_mean_KDE.pdf', format='pdf')
 
+def calculatePValue(values, cutoff):
+   greaterValues = [x for x in values if x > cutoff]
+   pval = len(greaterValues)/1000
+   return pval
+
 def mannwhitney(hits, nonhits):
     # Perform the one-sided Mann-Whitney U test (sample1 > sample2)
     stat, p = mannwhitneyu(hits, nonhits, alternative="greater")
@@ -246,28 +251,28 @@ def mannwhitney(hits, nonhits):
     print(f"P-value: {p}")
 
 
-def permutationTest(hits, nonHits):
+def permutationTest(hits, nonHits, all):
     hitsMean = hits.mean()
     hitsProp = len(hits[hits > 0]) / len(hits)
 
-    nonHitMeansList = []
-    nonHitPropList = []
+    meansList = []
+    propList = []
     hitsLength = len(hits)
     for i in range(1000):
-        nonHitsSample = nonHits.sample(hitsLength)
-        nonHitsMean = nonHitsSample.mean()
-        nonHitsPropSamp = len(nonHitsSample[nonHitsSample > 0]) / len(nonHitsSample)
-        nonHitMeansList.append(nonHitsMean)
-        nonHitPropList.append(nonHitsPropSamp)
+        everythingSample = all.sample(hitsLength)
+        everythingMean = everythingSample.mean()
+        everythingPropSamp = len(everythingSample[everythingSample > 0]) / len(everythingSample)
+        meansList.append(everythingMean)
+        propList.append(everythingPropSamp)
 
     print("hits division: " + str(hitsProp))
     print("hits mean: " + str(hitsMean))
-    print(nonHitMeansList)
-    print(nonHitPropList)
+    print(meansList)
+    print(propList)
     nonHitsPropFull = len(nonHits[nonHits > 0]) / len(nonHits)
     print("Full division: " + str(nonHitsPropFull))
 
-    return hitsMean, hitsProp, nonHitMeansList, nonHitPropList
+    return hitsMean, hitsProp, meansList, propList
 
 
 ##Start of main stat and plotting script
@@ -330,9 +335,9 @@ print("Scatterplot")
 print(
     "---------------------------------------------------------------------------------------------------"
 )
-#scatterPlot(goAnalysisDf)
-print("Skip")
-
+scatterPlot(goAnalysisDf)
+#print("Skip")
+'''
 # print('---------------------------------------------------------------------------------------------------')
 # print('Datashader')
 # print('---------------------------------------------------------------------------------------------------')
@@ -365,18 +370,19 @@ print(hits["Overlap_Score"].value_counts())
 print("Non-Hit Value Counts")
 print(nonHits["Overlap_Score"].value_counts())
 
-hitsMean, hitsProp, nonHitsMeansList, nonHitsPropList = permutationTest(hits["Overlap_Score"], nonHits["Overlap_Score"])
+hitsMean, hitsProp, meansList, propList = permutationTest(hits["Overlap_Score"], nonHits["Overlap_Score"], goAnalysisDf["Overlap_Score"])
 
-plotPropKde(nonHitsPropList, hitsProp)
-plotMeanKde(nonHitsMeansList, hitsMean)
-
+plotPropKde(propList, hitsProp)
+propPVal = calculatePValue(propList, hitsProp)
+plotMeanKde(meansList, hitsMean)
+meanPVal = calculatePValue(meansList, hitsMean)
 
 # print(hits.head())
 # print(nonHits.head())
 # print('Mannwhitneyu test')
 # mannwhitney(hits['Overlap_Score'], nonHits['Overlap_Score'])
 # kde(hits, nonHits)
-
+'''
 print("\n")
 print("###########################################")
 print("Statistical analysis and plotting complete!")
