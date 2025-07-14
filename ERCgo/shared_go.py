@@ -64,8 +64,8 @@ def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
   print(' > DONE', flush=True)
   return geneGoDF, writePath
 
-def determineSharedGO(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
-  print('3. Analyze shared GO terms intersection for each pair and construct table', flush=True)
+def determineSharedGO(baseDF, masterOutPath, geneGoPath, argsDict):
+  print('3. Determine shared GO terms for each gene pair and construct table', flush=True)
 
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
   sharedStatsDF = baseDF.copy(deep=True)
@@ -107,9 +107,11 @@ def determineSharedGO(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   sharedStatsDF['Shared_GO'] = goTermIntersectionList
   sharedStatsDF['Number_of_Shared_GO'] = sharedGoLen
 
-  print('  > Write analysis table to tsv', flush=True)
+  print('  > Write table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/SHARED_GO_' + argsDict['job_name'] + '.tsv'
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
+  print('   > DONE', flush=True)
+  print(' > DONE', flush=True)
 
   return sharedStatsDF, analysisWritePath
 
@@ -237,7 +239,7 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   sharedStatsDF['Color'] = color
   sharedStatsDF['label'] = argsDict['job_name']
 
-  print('  > Write analysis table to tsv', flush=True)
+  print('  > Write table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/OVERLAP_SCORES_' + argsDict['job_name'] + '.tsv'
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
   print('   > DONE', flush=True)
