@@ -4,11 +4,13 @@ import gaf
 import shared_go
 import os
 import population
+import obo
 
-def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict):
+def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, obo_GODag, masterOutPath, intermediateFilesPath, argsDict):
   goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, masterOutPath, argsDict['job_name'])
   genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsFilePath, geneGoDict, intermediateFilesPath, argsDict)
   sharedGoDF, sharedGoPath = shared_go.determineSharedGO(genePairsGoDF, masterOutPath, genePairsGoPath, argsDict)
+  shared_go.goDetails(sharedGoPath, obo_GODag, sharedGoDF, masterOutPath, argsDict)
   shared_go.analyzeSharedGo(sharedGoDF, masterOutPath, sharedGoPath, goTermsFreq, argsDict)
 
 #######################
@@ -34,6 +36,7 @@ print('-------------------------------------------------------------------------
 ##Check input
 print('> Verify correct input files are present for specified analysis...')
 gafFilePath = in_out.findGafFile(argsDict['input'])
+oboFilePath = in_out.findOboFile(argsDict['input'])
 if argsDict['analysis'] == 'hits':
   edgeFilePath = in_out.findEdgeFile(argsDict['input'])
   verticesFilePath = in_out.findVerticesFile(argsDict['input'])
@@ -75,9 +78,18 @@ print('-------------------------------------------------------------------------
 print('Processing GAF')
 print('---------------------------------------------------------------------------------------------------')
 
-##Create dictionary of genes and associated GO terms by reading and processing GAF
+##Create dictionary of genes and associated GO terms by reading and processing GAF using goatools
 #GAF file
 geneGoDict = gaf.processGaf(gafFilePath, masterOutPath)
+print('> DONE')
+
+print('---------------------------------------------------------------------------------------------------')
+print('Processing OBO')
+print('---------------------------------------------------------------------------------------------------')
+
+##Create GO terms object by reading and processing OBO using goatools
+#GAF file
+obo_GODag = obo.loadGodAg(oboFilePath)
 print('> DONE')
 
 ########################################
@@ -105,14 +117,14 @@ print('GO term analysis')
 print('=======================================================================================================')
 
 if argsDict['analysis'] == 'hits':
-  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
+  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, obo_GODag, masterOutPath, intermediateFilesPath, argsDict)
 
 elif argsDict['analysis'] == 'full':
-  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
+  analysisPipeline(genePairsDF, genePairsDropNaPath, geneGoDict, obo_GODag, masterOutPath, intermediateFilesPath, argsDict)
 
 elif argsDict['analysis'] == 'both':
-  analysisPipeline(hitGenePairsDF, hitGenePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
-  analysisPipeline(fullGenePairsDF, fullGenePairsDropNaPath, geneGoDict, masterOutPath, intermediateFilesPath, argsDict)
+  analysisPipeline(hitGenePairsDF, hitGenePairsDropNaPath, geneGoDict, obo_GODag, masterOutPath, intermediateFilesPath, argsDict)
+  analysisPipeline(fullGenePairsDF, fullGenePairsDropNaPath, geneGoDict, obo_GODag, masterOutPath, intermediateFilesPath, argsDict)
 
 print('#####################')
 print('Go analysis complete! ')

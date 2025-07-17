@@ -1,4 +1,5 @@
 import pandas
+import obo
 
 def collectGoTerms(genePairsPath, goTermsDict, intermediateFilesPath, argsDict):
   ##For each gene pair, get GO terms for each gene and write all associations to tsv file
@@ -100,7 +101,7 @@ def determineSharedGO(baseDF, masterOutPath, geneGoPath, argsDict):
       #Determine intersection, if any, of GO terms for each gene in the gene pair
       goTermIntersection = goSetA & goSetB
       #Append intersecting GO terms to column list
-      goTermIntersectionList.append(goTermIntersection)
+      goTermIntersectionList.append(list(goTermIntersection))
       #Get and append number of intersecting GO terms to column list
       sharedGoLen.append(len(goTermIntersection))
 
@@ -130,8 +131,34 @@ def colorCode(geneA, geneB, interestGenes, clpGenes):
       
   return colorStr
 
+def goDetails(sharedGoPath, go_dag, sharedGoDF, masterOutPath, argsDict):
+  print('4. Collect more information about shared GO terms', flush=True)
+
+  goDetailsCol = []
+
+  with open(sharedGoPath, 'r') as genePairs:
+    #Skip first line with column titles
+    next(genePairs)
+    for line in genePairs:
+      goDetails = []
+      #Separate 'row' data
+      lineData = line.strip().split('\t')
+
+      sharedGoIds = eval(lineData[10])
+
+      goDetails = obo.getNames(sharedGoIds, go_dag)
+      goDetailsCol.append(goDetails)
+  
+  sharedGoDF['GO Term Names'] = goDetailsCol
+
+  print('  > Write table to tsv', flush=True)
+  analysisWritePath = masterOutPath + '/SHARED_GO_DETAILS_' + argsDict['job_name'] + '.tsv'
+  sharedGoDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
+  print('   > DONE', flush=True)
+  print(' > DONE', flush=True)
+
 def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
-  print('4. Calculate GO Overlap Scores', flush=True)
+  print('5. Calculate GO Overlap Scores', flush=True)
 
   ##Create copy of gene pairs with GO terms dataframe to add on analysis data
   sharedStatsDF = baseDF.copy(deep=True)

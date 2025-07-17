@@ -57,6 +57,18 @@ def findGafFile(directory):
   else:
     sys.exit('  > Too many GAF files found. Terminating ERCgo.')
 
+def findOboFile(directory):
+  search_result = glob.glob(directory + '/*.obo')
+  if len(search_result) == 0:
+    sys.exit('  > OBO file not found. Terminating ERCgo.')
+
+  elif len(search_result) == 1:
+    print(' > OBO file found.')
+    return search_result[0]
+
+  else:
+    sys.exit('  > Too many OBO files found. Terminating ERCgo.')
+
 
 def checkOutputDirectory(outPath):
   if not os.path.exists(outPath):
