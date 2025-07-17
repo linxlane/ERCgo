@@ -134,22 +134,35 @@ def colorCode(geneA, geneB, interestGenes, clpGenes):
 def goDetails(sharedGoPath, go_dag, sharedGoDF, masterOutPath, argsDict):
   print('4. Collect more information about shared GO terms', flush=True)
 
-  goDetailsCol = []
+  geneAGoNamesCol = []
+  geneBGoNamesCol = []
+  sharedGoNamesCol = []
 
   with open(sharedGoPath, 'r') as genePairs:
     #Skip first line with column titles
     next(genePairs)
     for line in genePairs:
-      goDetails = []
+      aGoNames = []
+      bGoNames = []
+      sharedGoNames = []
       #Separate 'row' data
       lineData = line.strip().split('\t')
 
-      sharedGoIds = eval(lineData[10])
+      geneAGO = eval(lineData[6])
+      aGoNames = obo.getNames(geneAGO, go_dag)
+      geneAGoNamesCol.append(aGoNames)
 
-      goDetails = obo.getNames(sharedGoIds, go_dag)
-      goDetailsCol.append(goDetails)
+      geneBGO = eval(lineData[7])
+      bGoNames = obo.getNames(geneBGO, go_dag)
+      geneBGoNamesCol.append(bGoNames)
+
+      sharedGoIds = eval(lineData[10])
+      sharedGoNames = obo.getNames(sharedGoIds, go_dag)
+      sharedGoNamesCol.append(sharedGoNames)
   
-  sharedGoDF['GO Term Names'] = goDetailsCol
+  sharedGoDF['Gene_A_GO_Term_Names'] = geneAGoNamesCol
+  sharedGoDF['Gene_B_GO_Term_Names'] = geneBGoNamesCol
+  sharedGoDF['Shared_GO_Term_Names'] = sharedGoNamesCol
 
   print('  > Write table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/SHARED_GO_DETAILS_' + argsDict['job_name'] + '.tsv'
