@@ -10,8 +10,10 @@ def analysisPipeline(genePairsDF, genePairsFilePath, geneGoDict, obo_GODag, mast
   goTermsFreq = population.calculatePopulationFrequencies(genePairsDF, geneGoDict, masterOutPath, argsDict['job_name'])
   genePairsGoDF, genePairsGoPath = shared_go.collectGoTerms(genePairsFilePath, geneGoDict, intermediateFilesPath, argsDict)
   sharedGoDF, sharedGoPath = shared_go.determineSharedGO(genePairsGoDF, masterOutPath, genePairsGoPath, argsDict)
-  shared_go.goDetails(sharedGoPath, obo_GODag, sharedGoDF, masterOutPath, argsDict)
-  shared_go.analyzeSharedGo(sharedGoDF, masterOutPath, sharedGoPath, goTermsFreq, argsDict)
+  sharedGoDetailsDF = shared_go.goDetails(sharedGoPath, obo_GODag, sharedGoDF, masterOutPath, argsDict)
+  overlapScoresDF = shared_go.analyzeSharedGo(sharedGoDF, masterOutPath, sharedGoPath, goTermsFreq, argsDict)
+  summary = in_out.writeSummaryFile(sharedGoDetailsDF, overlapScoresDF, masterOutPath, argsDict)
+
 
 #######################
 # Start of ERCgo main #

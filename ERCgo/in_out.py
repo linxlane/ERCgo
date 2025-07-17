@@ -168,3 +168,15 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
   print(' > DONE', flush=True)
 
   return mergeDF, genePairsStatsDropNaPath
+
+
+def writeSummaryFile(sharedGoDetailsDF, overlapScoresDF, masterOutPath, argsDict):
+  summaryDF = sharedGoDetailsDF.copy()
+  summaryDF['Overlap_Score'] = overlapScoresDF['Overlap_Score']
+
+  print('  > Write table to tsv', flush=True)
+  analysisWritePath = masterOutPath + '/SUMMARY_' + argsDict['job_name'] + '.tsv'
+  summaryDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
+  print('   > DONE', flush=True)
+  print(' > DONE', flush=True)
+  return summaryDF

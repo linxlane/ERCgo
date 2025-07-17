@@ -157,6 +157,8 @@ def goDetails(sharedGoPath, go_dag, sharedGoDF, masterOutPath, argsDict):
   print('   > DONE', flush=True)
   print(' > DONE', flush=True)
 
+  return sharedGoDF
+
 def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   print('5. Calculate GO Overlap Scores', flush=True)
 
@@ -271,3 +273,5 @@ def analyzeSharedGo(baseDF, masterOutPath, geneGoPath, frequencies, argsDict):
   sharedStatsDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
   print('   > DONE', flush=True)
   print(' > DONE', flush=True)
+
+  return sharedStatsDF
