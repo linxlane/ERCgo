@@ -169,12 +169,23 @@ def formatFullResults(argsDict, intermediateFilesPath, ercFilePath):
 
   return mergeDF, genePairsStatsDropNaPath
 
+def averageR2(df):
+  return (float(df['P_R2']) + float(df['S_R2'])) / 2
+
 
 def writeSummaryFile(sharedGoDetailsDF, overlapScoresDF, masterOutPath, argsDict):
+  print('=======================================================================================================')
+  print('Write Summary file of analysis highlights')
+  print('=======================================================================================================')
   summaryDF = sharedGoDetailsDF.copy()
-  summaryDF['Overlap_Score'] = overlapScoresDF['Overlap_Score']
 
-  print('  > Write table to tsv', flush=True)
+  print(' > Add Average R2 column at index 6', flush=True)
+  avgR2 = list(summaryDF.apply(averageR2, axis = 1))
+  summaryDF.insert(6, 'Average_R2', avgR2)
+  summaryDF['Overlap_Score'] = overlapScoresDF['Overlap_Score']
+  print('   > DONE', flush=True)
+
+  print(' > Write table to tsv', flush=True)
   analysisWritePath = masterOutPath + '/SUMMARY_' + argsDict['job_name'] + '.tsv'
   summaryDF.to_csv(analysisWritePath, sep='\t', index=False, na_rep='N/A')
   print('   > DONE', flush=True)
